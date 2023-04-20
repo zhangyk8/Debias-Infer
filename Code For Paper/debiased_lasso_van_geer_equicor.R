@@ -7,7 +7,7 @@ print(jobid)
 d = 600
 n = 500
 
-rho = 0.8
+rho = 0.5
 Sigma = rho*array(1, dim = c(d,d)) + (1-rho)*diag(d)
 sig = 1
 

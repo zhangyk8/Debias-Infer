@@ -24,7 +24,7 @@ print(job_id)
 d = 600
 n = 500
 
-rho = 0.8
+rho = 0.5
 Sigma = rho*np.ones((d,d)) + (1-rho)*np.eye(d)
 sig = 1
 
