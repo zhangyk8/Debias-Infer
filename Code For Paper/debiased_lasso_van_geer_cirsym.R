@@ -1,7 +1,9 @@
 library(mvtnorm)
 library(hdi)
 
-jobid = commandArgs(TRUE)
+for(b in 1:500){
+  # jobid = commandArgs(TRUE)
+  jobid = b
 print(jobid)
 
 d = 600
@@ -164,13 +166,23 @@ for(i in 0:3){
     }
     print(Sys.time() - start_time)
     
-    lproj_res = data.frame(m_obs1 = m_rproj_obs1, ci_len_obs1 = ci_len_rproj_obs1, 
-                           m_obs2 = m_rproj_obs2, ci_len_obs2 = ci_len_rproj_obs2, 
-                           m_ipw1 = m_rproj_ipw1, ci_len_ipw1 = ci_len_rproj_ipw1, 
-                           m_ipw2 = m_rproj_ipw2, ci_len_ipw2 = ci_len_rproj_ipw2, 
-                           m_full = m_rproj_full, ci_len_full = ci_len_rproj_full)
+    lproj_res = data.frame(m_obs1 = m_lproj_obs1, asym_se_obs1 = asym_var_lproj_obs1, 
+                           sigma_hat_obs1 = sigma_hat_lproj_obs1, 
+                           ci_len_obs1 = ci_len_debl_obs1,
+                           m_obs2 = m_lproj_obs2, asym_se_obs2 = asym_var_lproj_obs2, 
+                           sigma_hat_obs2 = sigma_hat_lproj_obs2, 
+                           ci_len_obs2 = ci_len_debl_obs2,
+                           m_ipw1 = m_lproj_ipw1, asym_se_ipw1 = asym_var_lproj_ipw1, 
+                           sigma_hat_ipw1 = sigma_hat_lproj_ipw1,
+                           ci_len_ipw1 = ci_len_debl_ipw1,
+                           m_ipw2 = m_lproj_ipw2, asym_se_ipw2 = asym_var_lproj_ipw2, 
+                           sigma_hat_ipw2 = sigma_hat_lproj_ipw2,
+                           ci_len_ipw2 = ci_len_debl_ipw2,
+                           m_full = m_lproj_full, asym_se_full = asym_var_lproj_full, 
+                           sigma_hat_full = sigma_hat_lproj_full, 
+                           ci_len_full = ci_len_debl_full)
     write.csv(lproj_res, paste0("./lproj_res/lproj_cirsym_d", d, "_n", n, "_", jobid, "_x", i, "_beta", k, ".csv"), 
               row.names=FALSE)
   }
 }
-
+}
