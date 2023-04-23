@@ -1,7 +1,7 @@
 library(mvtnorm)
 library(hdi)
 
-for(b in 1:500){
+for(b in 1:1000){
 # jobid = commandArgs(TRUE)
 jobid = b
 print(jobid)

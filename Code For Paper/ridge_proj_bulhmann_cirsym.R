@@ -73,7 +73,7 @@ for(i in c(0, 2)){
       deridge_obs = ridge.proj(X, Y, family = "gaussian", standardize = FALSE, 
                                lambda = 1, betainit = "scaled lasso", 
                                suppress.grouptesting = TRUE)
-      if(sum(abs(deridge_obs$bhat * x)) > 10){
+      if(sum(abs(deridge_obs$bhat * x)) > 200){
         flag = 1
         next;
       }
@@ -90,7 +90,7 @@ for(i in c(0, 2)){
       deridge_obs = ridge.proj(X, Y, family = "gaussian", standardize = FALSE, 
                                lambda = 1, betainit = "scaled lasso", 
                                suppress.grouptesting = TRUE)
-      if(sum(abs(deridge_obs$bhat * x)) > 10){
+      if(sum(abs(deridge_obs$bhat * x)) > 200){
         flag = 1
         next;
       }
@@ -108,7 +108,7 @@ for(i in c(0, 2)){
       deridge_ipw = ridge.proj(X, Y, family = "gaussian", standardize = FALSE, 
                                lambda = 1, betainit = "scaled lasso", 
                                suppress.grouptesting = TRUE)
-      if(sum(abs(deridge_ipw$bhat * x)) > 10){
+      if(sum(abs(deridge_ipw$bhat * x)) > 200){
         flag = 1
         next;
       }
@@ -125,7 +125,7 @@ for(i in c(0, 2)){
       deridge_ipw = ridge.proj(X, Y, family = "gaussian", standardize = FALSE, 
                                lambda = 1, betainit = "scaled lasso", 
                                suppress.grouptesting = TRUE)
-      while(sum(abs(deridge_ipw$bhat * x)) > 10){
+      if(sum(abs(deridge_ipw$bhat * x)) > 200){
         flag = 1
         next;
       }
@@ -143,7 +143,7 @@ for(i in c(0, 2)){
       deridge_full = ridge.proj(X, Y, family = "gaussian", standardize = FALSE, 
                                 lambda = 1, betainit = "scaled lasso", 
                                 suppress.grouptesting = TRUE)
-      while(sum(abs(deridge_full$bhat * x)) > 10){
+      if(sum(abs(deridge_full$bhat * x)) > 200){
         flag = 1
         next;
       }

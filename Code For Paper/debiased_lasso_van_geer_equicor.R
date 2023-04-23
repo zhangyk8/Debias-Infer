@@ -1,7 +1,7 @@
 library(mvtnorm)
 library(hdi)
 
-for(b in 1:500){
+for(b in 1:1000){
   # jobid = commandArgs(TRUE)
   jobid = b
 print(jobid)
@@ -78,7 +78,7 @@ for(i in 0:3){
       X = X_sim[R1 == 1,]
       Y = Y_sim[R1 == 1]
       delasso_obs = lasso.proj(X, Y, family = "gaussian", standardize = FALSE, 
-                               parallel = TRUE, ncores = 10, betainit = "scaled lasso", 
+                               parallel = TRUE, ncores = 40, betainit = "scaled lasso", 
                                return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
       if(sum(abs(delasso_obs$bhat * x)) > 200){
         flag = 1
@@ -94,7 +94,7 @@ for(i in 0:3){
       X = X_sim[R2 == 1,]
       Y = Y_sim[R2 == 1]
       delasso_obs = lasso.proj(X, Y, family = "gaussian", standardize = FALSE, 
-                               parallel = TRUE, ncores = 10, betainit = "scaled lasso", 
+                               parallel = TRUE, ncores = 40, betainit = "scaled lasso", 
                                return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
       if(sum(abs(delasso_obs$bhat * x)) > 200){
         flag = 1
@@ -111,7 +111,7 @@ for(i in 0:3){
       X = (diag(R1/sqrt(obs_prob1)) %*% X_sim)[R1 == 1,]
       Y = (Y_sim * (R1/sqrt(obs_prob1)))[R1 == 1]
       delasso_ipw = lasso.proj(X, Y, family = "gaussian", standardize = FALSE, 
-                               parallel = TRUE, ncores = 10, betainit = "scaled lasso", 
+                               parallel = TRUE, ncores = 40, betainit = "scaled lasso", 
                                return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
       if(sum(abs(delasso_ipw$bhat * x)) > 200){
         flag = 1
@@ -127,7 +127,7 @@ for(i in 0:3){
       X = (diag(1/sqrt(obs_prob2)) %*% X_sim)[R2 == 1,]
       Y = (Y_sim * (1/sqrt(obs_prob2)))[R2 == 1]
       delasso_ipw = lasso.proj(X, Y, family = "gaussian", standardize = FALSE, 
-                               parallel = TRUE, ncores = 10, betainit = "scaled lasso", 
+                               parallel = TRUE, ncores = 40, betainit = "scaled lasso", 
                                return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
       if(sum(abs(delasso_ipw$bhat * x)) > 200){
         flag = 1
@@ -144,7 +144,7 @@ for(i in 0:3){
       X = X_sim
       Y = Y_sim
       delasso_full = lasso.proj(X, Y, family = "gaussian", standardize = FALSE, 
-                                parallel = TRUE, ncores = 10, betainit = "scaled lasso", 
+                                parallel = TRUE, ncores = 40, betainit = "scaled lasso", 
                                 return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
       if(sum(abs(delasso_full$bhat * x)) > 200){
         flag = 1

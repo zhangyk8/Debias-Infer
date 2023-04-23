@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name dl_van_equicor        # Set a name for your job. This is especially useful if you have multiple jobs queued.
-#SBATCH --partition largemem         # Slurm partition to use
-#SBATCH --array=1-1000%50               # How many tasks in the array
-#SBATCH --time 3-11:10             # Wall time limit in D-HH:MM
+#SBATCH --partition medium         # Slurm partition to use
+#SBATCH --ntasks 11              # Number of tasks to run. By default, one CPU core will be allocated per task
+#SBATCH --time 12-11:50             # Wall time limit in D-HH:MM
 #SBATCH --mem-per-cpu=1000           # Memory limit for each tasks (in MB)
 #SBATCH -o out/dl_van_equicor_%j.out        # File to which STDOUT will be written
 #SBATCH -e out/dl_van_equicor_%j.err        # File to which STDERR will be written
