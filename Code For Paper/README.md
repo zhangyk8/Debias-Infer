@@ -28,7 +28,7 @@ To infer the regression function <img src="https://latex.codecogs.com/svg.latex?
 - <img src="https://latex.codecogs.com/svg.latex?&space;x=(1,0,...,0)^T\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the first coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
 - <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2},\frac{1}{4},0,0,0,\frac{1}{2},\frac{1}{8},0,...,0\right)\in\mathbb{R}^d"/>.
 - <img src="https://latex.codecogs.com/svg.latex?&space;x=(0,...,0,\underbrace{1}_{100^{th}},0,...,0)\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the 100-th coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2^2},...,\frac{1}{d^2}\right)\in\mathbb{R}^d"/>.
+- <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2^2},...,\frac{1}{d^2}\right)\in\mathbb{R}^d"/>. (I corrected it to <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2},...,\frac{1}{d}\right)\in\mathbb{R}^d"/> when experimenting on d=1000,n=900.)
 
 
 For the comparative studies, we compare our debiased framework with the following four existing methods:
