@@ -5,7 +5,7 @@ The data sample <img src="https://latex.codecogs.com/svg.latex?&space;\left\{(X_
 <img src="https://latex.codecogs.com/svg.latex?\large&space;Y_i=\beta_0^TX_i+\epsilon_i,\quad\,i=1,...,n,"/>
 
 where <img src="https://latex.codecogs.com/svg.latex?&space;X_i\sim\mathcal{N}_d(0,\Sigma)"/>, 
-<img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{E}(\epsilon_i)=0,\mathrm{Var}(\epsilon_i)=\sigma^2=1"/>, and <img src="https://latex.codecogs.com/svg.latex?&space;d=600,n=500"/>.
+<img src="https://latex.codecogs.com/svg.latex?&space;\mathbb{E}(\epsilon_i)=0,\mathrm{Var}(\epsilon_i)=\sigma^2=1"/>, and <img src="https://latex.codecogs.com/svg.latex?&space;d=1000,n=900"/>.
 
 Here, we consider three different covariance matrices <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/>:
 - <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is toeplitz, in which <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ij}=\rho^{|i-j|}"/> with <img src="https://latex.codecogs.com/svg.latex?&space;\rho=0.9\,"/>; see Section 4 of van de Geer et al. (2014).
