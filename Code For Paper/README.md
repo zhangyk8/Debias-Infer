@@ -18,7 +18,7 @@ As for the noise distribution, we consider three different choices:
 - <img src="https://latex.codecogs.com/svg.latex?&space;\epsilon_i\sim\mathrm{Laplace}\left(\mu=0,\lambda=\frac{1}{\sqrt{2}}\right)"/> for <img src="https://latex.codecogs.com/svg.latex?&space;i=1,...,n"/>. Recall that the Laplace distribution has its probability density function as <img src="https://latex.codecogs.com/svg.latex?&space;f(x;\mu,\lambda)=\frac{1}{2\lambda}\exp\left(-\frac{|x-\mu|}{\lambda}\right)"/> with <img src="https://latex.codecogs.com/svg.latex?&space;\mu\in\mathbb{R}"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\lambda>0"/>.
 
 We also specify three different choices for <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0"/>:
-- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0=(\underbrace{1,...,1}_{5},0,...,0)^T\in\mathbb{R}^d"/> is sparse. (I change this to <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0=(\underbrace{\sqrt{5},...,\sqrt{5}}_{5},0,...,0)^T\in\mathbb{R}^d"/> when experimenting on d=1000,n=900.)
+- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0=(\underbrace{\sqrt{5},...,\sqrt{5}}_{5},0,...,0)^T\in\mathbb{R}^d"/> is sparse.
 - <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\propto\left(1,\frac{1}{\sqrt{2}},...,\frac{1}{\sqrt{d}}\right)^T\in\mathbb{R}^d"/> is dense.
 - <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\propto\left(1,\frac{1}{2},...,\frac{1}{d}\right)^T\in\mathbb{R}^d"/> is pseudo-dense.
 
