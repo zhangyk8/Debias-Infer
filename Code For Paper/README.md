@@ -12,10 +12,11 @@ Here, we consider three different covariance matrices <img src="https://latex.co
 - <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is equi-correlated, in which <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ij}=0.5"/> when <img src="https://latex.codecogs.com/svg.latex?&space;i\neq\,j"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ii}=1\,"/>; see Section 4 of van de Geer et al. (2014).
 - <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is circulant symmetric; see Section 5.1 in Javanmard and Montarani (2014).
 
-As for the noise distribution, we consider three different choices:
+As for the noise distribution, we consider four different choices:
 - <img src="https://latex.codecogs.com/svg.latex?&space;\epsilon_i\sim\mathcal{N}(0,1)"/> for <img src="https://latex.codecogs.com/svg.latex?&space;i=1,...,n"/>.
 - <img src="https://latex.codecogs.com/svg.latex?&space;\epsilon_i\sim\mathrm{Uniform}\left[-\sqrt{3},\sqrt{3}\right]"/> for <img src="https://latex.codecogs.com/svg.latex?&space;i=1,...,n"/>.
 - <img src="https://latex.codecogs.com/svg.latex?&space;\epsilon_i\sim\mathrm{Laplace}\left(\mu=0,\lambda=\frac{1}{\sqrt{2}}\right)"/> for <img src="https://latex.codecogs.com/svg.latex?&space;i=1,...,n"/>. Recall that the Laplace distribution has its probability density function as <img src="https://latex.codecogs.com/svg.latex?&space;f(x;\mu,\lambda)=\frac{1}{2\lambda}\exp\left(-\frac{|x-\mu|}{\lambda}\right)"/> with <img src="https://latex.codecogs.com/svg.latex?&space;\mu\in\mathbb{R}"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\lambda>0"/>.
+- <img src="https://latex.codecogs.com/svg.latex?&space;\epsilon_i\sim t_2"/> for <img src="https://latex.codecogs.com/svg.latex?&space;i=1,...,n"/>, i.e., the t-distribution with 2 degrees of freedom.
 
 We also specify three different choices for <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0"/>:
 - <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0=(\underbrace{\sqrt{5},...,\sqrt{5}}_{5},0,...,0)^T\in\mathbb{R}^d"/> is sparse.
