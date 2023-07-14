@@ -13,5 +13,5 @@
 source /etc/profile.d/z00_lmod.sh
 module load R
 i=${SLURM_ARRAY_TASK_ID}
-python ./Debiased_Inf_CirSym_Rversion.R ${i}
+Rscript ./Debiased_Inf_CirSym_Rversion.R ${i}
 

@@ -3,10 +3,10 @@ library(glmnet)
 library(pracma)
 library(MASS)
 library(caret)
-source("debias_prog.R")
+source("./debias_prog.R")
 
-jobid = commandArgs(TRUE)
-# jobid = 1
+# jobid = commandArgs(TRUE)
+jobid = 1
 print(jobid)
 
 d = 1000
