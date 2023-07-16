@@ -307,11 +307,13 @@ for i in range(5):
 ## Lasso Pilot Estimates
 for i in range(5):
     for k in range(3):
-        lasso_pilot_res = pd.DataFrame()
-        B = 1000
-        for b in range(1, B+1):
-            lasso_pilot = pd.read_csv('./pilot_res/lasso_pilot_Cirsym_d'+str(d)+'_n'+str(n)+'_'+str(b)+'_x'+str(i)+'_beta'+str(k)+'.csv')
-            lasso_pilot_res = pd.concat([lasso_pilot_res, lasso_pilot])
-        lasso_pilot_res.to_csv('./Results/lasso_pilot_Cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'+str(k)+'.csv', 
-                          index=False)
+        for error in ['gauss', 'laperr', 'terr', 'uniferr']:
+            lasso_pilot_res = pd.DataFrame()
+            B = 1000
+            for b in range(1, B+1):
+                lasso_pilot = pd.read_csv('./pilot_res/lasso_pilot_Cirsym_d'+str(d)+'_n'+str(n)+'_'+str(b)+\
+                                  '_x'+str(i)+'_beta'+str(k)+'_'+str(error)+'.csv')
+                lasso_pilot_res = pd.concat([lasso_pilot_res, lasso_pilot])
+            lasso_pilot_res.to_csv('./Results/lasso_pilot_Cirsym_d'+str(d)+'_n'+str(n)+'_'+str(b)+\
+                              '_x'+str(i)+'_beta'+str(k)+'_'+str(error)+'.csv', index=False)
         
