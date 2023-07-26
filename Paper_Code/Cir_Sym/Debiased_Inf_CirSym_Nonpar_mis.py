@@ -12,6 +12,7 @@ several nonparametric methods.
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 import scipy.stats
+from sklearn.linear_model import LogisticRegressionCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
@@ -99,7 +100,12 @@ for i in [0,1,2,4]:
         beta_pilot2, sigma_pilot2 = ScaledLasso(X=X_sim[R2 == 1,:], Y=Y_sim[R2 == 1], lam0='univ') 
             
         ## Propensity score estimation (Naive Bayes, Random Forests, SVM, MLP neural network)
-        for non_met in ['NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
+        for non_met in ['LR', 'NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
+            if non_met == 'LR':
+                zeta2 = np.logspace(-1, np.log10(300), 40)*np.sqrt(np.log(d)/n)
+                lr2 = LogisticRegressionCV(Cs=1/zeta2, cv=5, penalty='l1', scoring='neg_log_loss', 
+                                           solver='liblinear', tol=1e-6, max_iter=10000).fit(X_sim, R2)
+                prop_score2 = lr2.predict_proba(X_sim)[:,1]
             if non_met == 'NB':
                 lr2_NB = GaussianNB().fit(X_sim, R2)
                 prop_score2 = lr2_NB.predict_proba(X_sim)[:,1]
