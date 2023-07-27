@@ -99,53 +99,65 @@ for i in [0,1,2,4]:
         ## Lasso pilot estimator
         beta_pilot2, sigma_pilot2 = ScaledLasso(X=X_sim[R2 == 1,:], Y=Y_sim[R2 == 1], lam0='univ') 
             
-        ## Propensity score estimation (Naive Bayes, Random Forests, SVM, MLP neural network)
-        for non_met in ['LR', 'NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
+        ## Propensity score estimation (LR, Naive Bayes, Random Forests, SVM, MLP neural network)
+        for non_met in ['Oracle', 'LR', 'NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
+            if non_met == 'Oracle':
+                prop_score2 = obs_prob2.copy()
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
             if non_met == 'LR':
                 zeta2 = np.logspace(-1, np.log10(300), 40)*np.sqrt(np.log(d)/n)
                 lr2 = LogisticRegressionCV(Cs=1/zeta2, cv=5, penalty='l1', scoring='neg_log_loss', 
                                            solver='liblinear', tol=1e-6, max_iter=10000).fit(X_sim, R2)
                 prop_score2 = lr2.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
             if non_met == 'NB':
                 lr2_NB = GaussianNB().fit(X_sim, R2)
                 prop_score2 = lr2_NB.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'NBcal':
                 NB_base = GaussianNB()
                 lr2_NB = CalibratedClassifierCV(NB_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_NB.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'RF':
                 lr2_RF = RandomForestClassifier(n_estimators=100, max_depth=None, 
                                                 random_state=None, n_jobs=-1).fit(X_sim, R2)
                 prop_score2 = lr2_RF.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'RFcal':
                 RF_base = RandomForestClassifier(n_estimators=100, max_depth=None, 
                                                  random_state=None, n_jobs=-1)
                 lr2_RF = CalibratedClassifierCV(RF_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_RF.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
             
             if non_met == 'SVM':
                 lr2_SVM = SVC(kernel='rbf', gamma='scale', probability=True).fit(X_sim, R2)
                 prop_score2 = lr2_SVM.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'SVMcal':
                 SVM_base = SVC(kernel='rbf', gamma='scale', probability=True)
                 lr2_SVM = CalibratedClassifierCV(SVM_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_SVM.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'NN':
                 lr2_NN = MLPClassifier(hidden_layer_sizes=(80,50,), activation='relu', 
                                        random_state=None, learning_rate='adaptive', 
                                        learning_rate_init=0.001, max_iter=1000).fit(X_sim, R2)
                 prop_score2 = lr2_NN.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
                 
             if non_met == 'NNcal':
                 NN_base = MLPClassifier(hidden_layer_sizes=(80,50,), activation='relu', random_state=None, 
                                         learning_rate='adaptive', learning_rate_init=0.001, max_iter=1000)
                 lr2_NN = CalibratedClassifierCV(NN_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_NN.predict_proba(X_sim)[:,1]
+                MAE_prop = np.mean(prop_score2 - obs_prob2)
             
             gamma_n_lst = np.linspace(0.001, np.max(abs(x)), 41)
             cv_fold = 5
@@ -208,4 +220,4 @@ for i in [0,1,2,4]:
                     
                 with open('./debias_res/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'n'+str(n)+'_MAR'\
                           +str(job_id)+'_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'_mis.dat', "wb") as file:
-                    pickle.dump([m_deb2, asym_var2, sigma_hat2], file)
+                    pickle.dump([m_deb2, asym_var2, sigma_hat2, MAE_prop], file)

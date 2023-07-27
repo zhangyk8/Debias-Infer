@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --exclude cls-cmp-a14,cls-cmp-a13
+#SBATCH --exclude cls-cmp-a14,cls-cmp-a13,cls-cmp-c8
 #SBATCH --job-name deb_cir_nonpar_mis        # Set a name for your job. This is especially useful if you have multiple jobs queued.
 #SBATCH --partition medium         # Slurm partition to use
 #SBATCH --array=1-1000               # How many tasks in the array
