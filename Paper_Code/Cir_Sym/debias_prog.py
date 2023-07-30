@@ -10,6 +10,7 @@ Description: This script contains the key functions for our debiasing program.
 import numpy as np
 import scipy.stats
 from sklearn.linear_model import Lasso
+import statsmodels.api as sm
 import cvxpy as cp
 import ray
 
@@ -63,6 +64,49 @@ def ScaledLasso(X, Y, lam0=None, return_lamb=False):
         return beta_est, sigma_new, lam
     else:
         return beta_est, sigma_new
+
+
+def LassoRefit(X, Y, x, method='scaled_lasso', return_beta=False):
+    '''
+    Lasso refitting function.
+    
+    Parameters
+    ----------
+        method: string
+            The actual method for fitting the Lasso regression. It can be either 
+            'sqrt_lasso' or the default value 'scaled_lasso'.
+    '''
+    if method == 'sqrt_lasso':
+        n = X.shape[0]
+        d = X.shape[1]
+        sqrt_lasso = sm.OLS(Y,X).fit_regularized(method='sqrt_lasso', 
+                                                 alpha=1.1*np.sqrt(n)*scipy.stats.norm.ppf(1-0.05/(2*d)), 
+                                                 L1_wt=1.0, refit=False)
+        beta_pilot = sqrt_lasso.params
+    else:
+        beta_pilot, sigma_pilot = ScaledLasso(X=X, Y=Y, lam0='quantile')
+    flag = 1
+    thres = 1e-7
+    while flag == 1:
+        X_sel = X[:,abs(beta_pilot) > thres]
+        inv_Sigma = np.linalg.inv(np.dot(X_sel.T, X_sel))
+        beta_new = np.dot(inv_Sigma, np.dot(X_sel.T, Y))
+        x_new = x[abs(beta_pilot) > thres]
+        
+        m_refit = np.dot(beta_new, x_new)
+        asym_var = np.sqrt(np.dot(x_new, np.dot(inv_Sigma, x_new)))
+        df = X_sel.shape[0] - X_sel.shape[1]
+        if df > 0:
+            flag = 0
+            sigma_hat = np.sqrt(np.sum((Y - np.dot(X_sel, beta_new))**2)/df)
+        else:
+            thres = 10*thres
+            print('The degree of freedom is negative for Lasso refitting. '+
+                  'We will raise the threshold for nonzero regression coefficients')
+    if return_beta:
+        return m_refit, beta_pilot, asym_var, sigma_hat, df
+    else:
+        return m_refit, asym_var, sigma_hat, df
 
 
 def DebiasProg(X, x, Pi, gamma_n=0.1):
@@ -156,7 +200,11 @@ def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
             mask[j] = 0
             A_kj = A[mask, j]
             ll_cur = ll_cur[mask]
-            ll_new[j] = SoftThres(-np.dot(A_kj, ll_cur)/(2*n) - x[j], lamb=gamma_n)/(A[j,j]/(2*n))
+            up_val = SoftThres(-np.dot(A_kj, ll_cur)/(2*n) - x[j], lamb=gamma_n)/(A[j,j]/(2*n))
+            if np.isnan(up_val):
+                ll_new[j] = 0
+            else:
+                ll_new[j] = up_val
         if (cnt > max_iter) and (flag == 0):
             print('The coordinate descent algorithm has reached its maximum number of iterations: '\
                   +str(max_iter)+'!')
