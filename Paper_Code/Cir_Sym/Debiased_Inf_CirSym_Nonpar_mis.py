@@ -45,6 +45,7 @@ sig = 1
 
 ## Consider different simulation settings
 for i in [0,1,2,4]:
+# for i in range(5):
     if i == 0:
         ## x0
         x = np.zeros((d,))
@@ -67,7 +68,8 @@ for i in [0,1,2,4]:
     if i == 4:
         ## x4
         x = 1/np.linspace(1, d, d)**2
-    for k in [0,2]:
+    for k in [0,1,2]:
+    # for k in range(3):
         if k == 0:
             s_beta = 5
             beta_0 = np.zeros((d,))
@@ -103,61 +105,61 @@ for i in [0,1,2,4]:
         for non_met in ['Oracle', 'LR', 'NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
             if non_met == 'Oracle':
                 prop_score2 = obs_prob2.copy()
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
             if non_met == 'LR':
                 zeta2 = np.logspace(-1, np.log10(300), 40)*np.sqrt(np.log(d)/n)
                 lr2 = LogisticRegressionCV(Cs=1/zeta2, cv=5, penalty='l1', scoring='neg_log_loss', 
                                            solver='liblinear', tol=1e-6, max_iter=10000).fit(X_sim, R2)
                 prop_score2 = lr2.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
             if non_met == 'NB':
                 lr2_NB = GaussianNB().fit(X_sim, R2)
                 prop_score2 = lr2_NB.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'NBcal':
                 NB_base = GaussianNB()
                 lr2_NB = CalibratedClassifierCV(NB_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_NB.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'RF':
                 lr2_RF = RandomForestClassifier(n_estimators=100, max_depth=None, 
                                                 random_state=None, n_jobs=-1).fit(X_sim, R2)
                 prop_score2 = lr2_RF.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'RFcal':
                 RF_base = RandomForestClassifier(n_estimators=100, max_depth=None, 
                                                  random_state=None, n_jobs=-1)
                 lr2_RF = CalibratedClassifierCV(RF_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_RF.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
             
             if non_met == 'SVM':
                 lr2_SVM = SVC(kernel='rbf', gamma='scale', probability=True).fit(X_sim, R2)
                 prop_score2 = lr2_SVM.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'SVMcal':
                 SVM_base = SVC(kernel='rbf', gamma='scale', probability=True)
                 lr2_SVM = CalibratedClassifierCV(SVM_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_SVM.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'NN':
                 lr2_NN = MLPClassifier(hidden_layer_sizes=(80,50,), activation='relu', 
                                        random_state=None, learning_rate='adaptive', 
                                        learning_rate_init=0.001, max_iter=1000).fit(X_sim, R2)
                 prop_score2 = lr2_NN.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
                 
             if non_met == 'NNcal':
                 NN_base = MLPClassifier(hidden_layer_sizes=(80,50,), activation='relu', random_state=None, 
                                         learning_rate='adaptive', learning_rate_init=0.001, max_iter=1000)
                 lr2_NN = CalibratedClassifierCV(NN_base, method='sigmoid', cv=5).fit(X_sim, R2)
                 prop_score2 = lr2_NN.predict_proba(X_sim)[:,1]
-                MAE_prop = np.mean(prop_score2 - obs_prob2)
+                MAE_prop = np.mean(abs(prop_score2 - obs_prob2))
             
             gamma_n_lst = np.linspace(0.001, np.max(abs(x)), 41)
             cv_fold = 5

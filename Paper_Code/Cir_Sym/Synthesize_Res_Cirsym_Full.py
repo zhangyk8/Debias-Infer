@@ -111,7 +111,7 @@ for i in range(5):
                                     index=False)
 
      
-# Proposed debiased program (nonparametric propensity score estimation)
+## Proposed debiased program (nonparametric propensity score estimation)
 for i in [0,1,2,4]:
     for k in [0,2]:
         ## Propensity score estimation (Naive Bayes, Random Forests, SVM, MLP neural network)
@@ -157,9 +157,43 @@ for i in [0,1,2,4]:
                 deb_prog_1se.to_csv('./Results/DebiasProg_Cirsym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
                                     '_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'.csv', 
                                     index=False)
-                    
 
-## Debiased Lasso (Javanmard and Montarani, 2014)
+
+## Proposed debiased program (nonparametric propensity score estimation with misspecified propensity score)
+for i in [0,1,2,4]:
+    for k in [0,1,2]:
+        ## Propensity score estimation (Naive Bayes, Random Forests, SVM, MLP neural network)
+        for non_met in ['Oracle', 'LR', 'NB', 'NBcal', 'RF', 'RFcal', 'SVM', 'SVMcal', 'NN', 'NNcal']:
+            # Different rules for choosing the tuning parameter
+            para_rule = ['1se', 'mincv', 'minfeas']
+            for rule in para_rule:
+                m_deb2_1se = []
+                asym_se2_1se = []  ## Already scaled by sqrt(n)
+                sigma_hat2_1se = []
+                MAE_prop_1se = []
+                B = 1000
+                for b in range(1, B+1):
+                    try:
+                        with open('./debias_res/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'n'+str(n)+'_MAR'\
+                                  +str(b)+'_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'_mis.dat', "rb") as file:
+                            m_deb, asym_se, sigma_hat, MAE_prop = pickle.load(file)
+                        m_deb2_1se.append(m_deb)
+                        asym_se2_1se.append(asym_se)
+                        sigma_hat2_1se.append(sigma_hat)
+                        MAE_prop_1se.append(MAE_prop)
+                    except:
+                        print('Nonpar '+str(non_met))
+                        print(b)
+                        continue
+                        
+                deb_prog_1se = pd.DataFrame({'m_deb2': m_deb2_1se, 'asym_se2': asym_se2_1se, 
+                                             'sigma_hat2': sigma_hat2_1se, 'mae_prop': MAE_prop_1se})
+                deb_prog_1se.to_csv('./Results/DebiasProg_Cirsym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
+                                    '_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'_mis.csv', 
+                                    index=False)
+
+
+# ## Debiased Lasso (Javanmard and Montarani, 2014)
 for i in range(5):
     for k in range(3):
         debl_res1 = pd.DataFrame()
@@ -200,6 +234,7 @@ for i in range(5):
             debl_res1 = pd.concat([debl_res1, debl])
         debl_res1.to_csv('./Results/debl_cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
                           +str(k)+'_laperr.csv', index=False)
+            
 
 ## Debiased Lasso (van de geer et al., 2014)
 for i in range(5):
@@ -217,7 +252,7 @@ for i in range(5):
                 print(b)
                 continue
             cnt += 1
-            if cnt > 100:
+            if cnt >= 200:
                 break
         lproj_res1.to_csv('./Results/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
                           +str(k)+'.csv', index=False)
