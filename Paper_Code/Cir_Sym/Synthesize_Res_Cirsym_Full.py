@@ -191,6 +191,26 @@ for i in [0,1,2,4]:
                 deb_prog_1se.to_csv('./Results/DebiasProg_Cirsym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
                                     '_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'_mis.csv', 
                                     index=False)
+                    
+                    
+## Proposed debiasing program (R implementation)
+for i in range(5):
+    for k in range(3):
+        para_rule = ['1se', 'mincv', 'minfeas']
+        for rule in para_rule:
+            debias_res1 = pd.DataFrame()
+            B = 1000
+            for b in range(1, B+1):
+                try:
+                    debias = pd.read_csv('./debias_res/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
+                                 '_'+str(b)+'_x'+str(i)+'_beta'+str(k)+'_rule'+rule+'_gauss_R.csv')
+                    debias_res1 = pd.concat([debias_res1, debias])
+                except:
+                    print('Gaussian R')
+                    print(b)
+                    continue
+            debias_res1.to_csv('./Results/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
+                             +str(k)+'_'+rule+'_gauss_R.csv', index=False)
 
 
 # ## Debiased Lasso (Javanmard and Montarani, 2014)
