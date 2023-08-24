@@ -22,6 +22,21 @@ from debias_prog import ScaledLasso, DebiasProg, DualObj, DualCD
 job_id = int(sys.argv[1])
 print(job_id)
 
+#==========================================================================================#
+
+def LassoRefit(X, Y, x):
+    beta_pilot, sigma_pilot = ScaledLasso(X=X, Y=Y, lam0='univ')
+    X_sel = X[:,abs(beta_pilot) > 1e-7]
+    inv_Sigma = np.linalg.inv(np.dot(X_sel.T, X_sel))
+    beta_new = np.dot(inv_Sigma, np.dot(X_sel.T, Y))
+    x_new = x[abs(beta_pilot) > 1e-7]
+    
+    m_refit = np.dot(beta_new, x_new)
+    asym_var = np.sqrt(np.dot(x_new, np.dot(inv_Sigma, x_new)))
+    df = X_sel.shape[0] - X_sel.shape[1]
+    sigma_hat = np.sqrt(np.sum((Y - np.dot(X_sel, beta_new))**2)/df)
+    return m_refit, asym_var, sigma_hat, df
+
 
 ## Read the data
 gal = pd.read_csv('./SDSS_Data/SDSS_gal_redshift04.csv')
@@ -222,4 +237,10 @@ for prop_met in ['LR', 'NN', 'NNcal']:
         debias_res = pd.DataFrame({'m_deb': [m_deb], 'asym_sd': [asym_var], 
                                    'sigma_hat': [sigma_hat], 'gamma_n':[gamma_n_opt]})
         debias_res.to_csv('./sdss_res/SDSS_stellar_mass_inf_x3_'+str(rule)+'_'+prop_met+'_'+str(job_id)+'.csv', index=False)
-        
+
+
+## Lasso Refit
+x = x_gal
+m_refit_obs, asym_se_obs, sigma_hat_obs, df = LassoRefit(X[R == 1,:], log_Y[R == 1], x)
+refit_res = pd.DataFrame({'m_deb': [m_refit_obs], 'asym_sd': [asym_se_obs], 'sigma_hat': [sigma_hat_obs], 'df': [df]})
+refit_res.to_csv('./sdss_res/SDSS_stellar_mass_lasso_refit_x3'+str(job_id)+'.csv', index=False)
