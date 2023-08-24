@@ -1,0 +1,5 @@
+https://skyserver.sdss.org/dr9/en/help/docs/datamodel.asp
+
+https://data.sdss.org/datamodel/files/SPECTRO_REDUX/specObj.html
+
+https://live-sdss4org-dr12.pantheonsite.io/algorithms/magnitudes/
