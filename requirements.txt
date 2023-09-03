@@ -1,0 +1,8 @@
+numpy
+scipy
+cvxpy[CVXOPT,MOSEK]
+scikit-learn
+statsmodels
+sphinx>=1.4
+ipykernel
+nbsphinx
