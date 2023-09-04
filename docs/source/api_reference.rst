@@ -5,4 +5,6 @@ API References
 Function Gallery of the Debiasing Inference Method
 ----------------------------------
 
-.. autofunction:: debiasing.debias_prog
+.. automodule:: debiasing.debias_prog
+    :members:
+    :show-inheritance:
