@@ -1,6 +1,6 @@
 numpy
 scipy
-cvxpy[CVXOPT,MOSEK]
+cvxpy
 scikit-learn
 statsmodels
 sphinx>=1.4
