@@ -1,6 +1,6 @@
 API References
 ======
 
-.. automodule:: debiasing.DebiasProg
+.. automodule:: debiasing.debias_prog
     :members:
     :show-inheritance:
