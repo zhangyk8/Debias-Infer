@@ -3,7 +3,7 @@
 # -- Project information
 
 project = 'Debias-Infer'
-copyright = '2022, Yikun Zhang'
+copyright = '2023, Yikun Zhang'
 author = 'Yikun Zhang'
 
 release = '0.1'

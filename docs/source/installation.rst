@@ -11,11 +11,11 @@ Dependencies
 Quick Start
 ------------
 
-To use a stable release of **skeleton-methods**, install it using pip::
+To use a stable release of **Debias-Infer**, install it using pip::
 
     pip install Debias-Infer
 
-The Pypi version is updated regularly. For the latest update, however, one should clone from GitHub and install it directly::
+The Pypi version is updated regularly. For the latest update, one can also clone from GitHub and install it directly::
 
     git clone https://github.com/zhangyk8/Debias-Infer.git
     cd Debias-Infer

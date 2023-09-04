@@ -2,7 +2,7 @@ API References
 ======
 
 
-Debiasing Inference Procedure
+Function Gallery of the Debiasing Inference Method
 ----------------------------------
 
 .. automodule:: debiasing.debias_prog
