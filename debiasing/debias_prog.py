@@ -13,7 +13,7 @@ from sklearn.linear_model import Lasso
 import statsmodels.api as sm
 import cvxpy as cp
 
-#==========================================================================================#
+#=======================================================================================#
 
 def ScaledLasso(X, Y, lam0=None, return_lamb=False):
     '''
@@ -21,10 +21,32 @@ def ScaledLasso(X, Y, lam0=None, return_lamb=False):
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+        
+        Y: (n,)-array
+            The input outcome (or response) vector.
+            
         lam0: str or float
             The regularization parameter, which can be "univ", "quantile" or 
-            other specified numerical value. (Default: if d<10^6, lam0="quantile"; 
-            otherwise, lam0="univ".)
+            other specified numerical value. (Default: lam0=None so that 
+            if d<10^6, lam0="quantile"; otherwise, lam0="univ".)
+        
+        return_lamb: logical
+            Whether the final value of the regularization parameter is returned
+            or not. (Default: return_lamb=False.)
+            
+    Returns
+    ----------
+        beta_est: (d,)-array
+            The estimated regression coefficient by scaled Lasso.
+            
+        sigma_new: float
+            The estimated noise level (i.e., the standard deviation of the noise
+            variable). 
+            
+        lam: float (optional)
+            The final value of the regularization parameter.
     '''
     n = X.shape[0]
     d = X.shape[1]
@@ -67,13 +89,46 @@ def ScaledLasso(X, Y, lam0=None, return_lamb=False):
 
 def LassoRefit(X, Y, x, method='scaled_lasso', return_beta=False):
     '''
-    Lasso refitting function.
+    Lasso refitting method.
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+        
+        Y: (n,)-array
+            The input outcome (or response) vector.
+            
+        x: (d,)-array
+            The current query point.
+            
         method: string
             The actual method for fitting the Lasso regression. It can be either 
             'sqrt_lasso' or the default value 'scaled_lasso'.
+            
+        return_beta: logical
+            Whether the final value of the estimated regression coefficient is 
+            returned or not. (Default: return_beta=False.)
+            
+    Returns
+    ----------
+        m_refit: float
+            The estimated regression function by Lasso refitting method.
+        
+        beta_pilot: (d,)-array (optional)
+            The estimated regression coefficient by scaled Lasso.
+            
+        asym_sd: float
+            The estimated (asymptotic) standard deviation of the Lasso refitting
+            estimator.
+            
+        sigma_hat: float
+            The estimated noise level (i.e., the standard deviation of the noise
+            variable).
+        
+        df: int
+            The degree of freedom of the t-distribution for the Lasso refitting
+            estimator.
     '''
     if method == 'sqrt_lasso':
         n = X.shape[0]
@@ -93,7 +148,7 @@ def LassoRefit(X, Y, x, method='scaled_lasso', return_beta=False):
         x_new = x[abs(beta_pilot) > thres]
         
         m_refit = np.dot(beta_new, x_new)
-        asym_var = np.sqrt(np.dot(x_new, np.dot(inv_Sigma, x_new)))
+        asym_sd = np.sqrt(np.dot(x_new, np.dot(inv_Sigma, x_new)))
         df = X_sel.shape[0] - X_sel.shape[1]
         if df > 0:
             flag = 0
@@ -103,19 +158,34 @@ def LassoRefit(X, Y, x, method='scaled_lasso', return_beta=False):
             print('The degree of freedom is negative for Lasso refitting. '+
                   'We will raise the threshold for nonzero regression coefficients')
     if return_beta:
-        return m_refit, beta_pilot, asym_var, sigma_hat, df
+        return m_refit, beta_pilot, asym_sd, sigma_hat, df
     else:
-        return m_refit, asym_var, sigma_hat, df
+        return m_refit, asym_sd, sigma_hat, df
 
 
 def DebiasProg(X, x, Pi, gamma_n=0.1):
     '''
-    Debiasing (primal) program.
+    Our proposed Debiasing (primal) program.
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+            
+        x: (d,)-array
+            The current query point.
+            
+        Pi: (n,n)-array
+            A diagonal matrix with (estimated) propensity scores as its diagonal
+            entries.
+            
         gamma_n: float
             The regularization parameter "\gamma/n". (Default: gamma_n=0.1.)
+            
+    Return
+    ----------
+        w: (n,)-array
+            The estimated weights by our debiasing program.
     '''
     n = X.shape[0]
     w = cp.Variable(n)
@@ -136,12 +206,20 @@ def DebiasProg(X, x, Pi, gamma_n=0.1):
 
 def SoftThres(theta, lamb):
     '''
-    Thresholding function.
+    Soft-thresholding function.
     
     Parameters
     ----------
+        theta: (d,)-array
+            The input vector for soft-thresholding.
+            
         lamb: float
             The thresholding parameter.
+    
+    Return
+    ----------
+        theta: (n,)-array
+            The output vector after soft-thresholding.
     '''
     try:
         return np.sign(theta)*max([abs(theta) - lamb, 0])
@@ -152,17 +230,36 @@ def SoftThres(theta, lamb):
     
 def DualObj(X, x, Pi, ll_cur, gamma_n=0.05):
     '''
-    Objective function of the dual form of our debiasing program.
+    Compute the objective function of the dual form of our debiasing program.
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+            
+        x: (d,)-array
+            The current query point.
+            
+        Pi: (n,n)-array
+            A diagonal matrix with (estimated) propensity scores as its diagonal
+            entries.
+            
+        ll_cur: (d,)-array
+            The current value of the dual solution vector.
+            
         gamma_n: float
             The regularization parameter "\gamma/n". (Default: gamma_n=0.05.)
+            
+    Return
+    ----------
+        dual_obj: float
+            The value of the objective function of our dual debiasing program.
     '''
     n = X.shape[0]
     A = np.dot(X.T, np.dot(Pi, X))
-    return np.dot(np.dot(ll_cur.reshape(1, -1), A), ll_cur)/(4*n) + np.dot(x, ll_cur) \
+    dual_obj = np.dot(np.dot(ll_cur.reshape(1, -1), A), ll_cur)/(4*n) + np.dot(x, ll_cur) \
         + gamma_n*np.sum(np.abs(ll_cur))
+    return dual_obj
     
 
 def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
@@ -171,11 +268,33 @@ def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+            
+        x: (d,)-array
+            The current query point.
+            
+        Pi: (n,n)-array
+            A diagonal matrix with (estimated) propensity scores as its diagonal
+            entries.
+            
         gamma_n: float
             The regularization parameter "\gamma/n". (Default: gamma_n=0.05.)
             
+        ll_init: (d,)-array
+            The initial value of the dual solution vector. (Default: ll_init=None.
+            Then, the vector with all-one entries is used.)
+            
+        eps: float.
+            The precision parameter for stopping the iteration. (Default: eps=1e-9.)
+            
         max_iter: int
             Maximum number of coordinate descent iterations. (Default: max_iter=5000.)
+            
+    Return
+    ----------
+        ll_new: (d,)-array
+            The solution vector to our dual debiasing program.
     '''
     n = X.shape[0]
     d = X.shape[1]
@@ -206,7 +325,7 @@ def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
                 ll_new[j] = up_val
         if (cnt > max_iter) and (flag == 0):
             print('The coordinate descent algorithm has reached its maximum number of iterations: '\
-                  +str(max_iter)+'!')
+                  +str(max_iter)+'! Reiterate one more times without small perturbations to the scaled design matrix...')
             A = A + 1e-9*np.eye(d)
             cnt = 0
             flag = 1
@@ -215,12 +334,41 @@ def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
 
 def DualADMM(X, x, Pi=None, gamma_n=0.05, rho=1, ll_init=None, eps=1e-9):
     '''
-    ADMM algorithm for solving the dual form of our debiasing program.
+    Alternating direction method of multipliers (ADMM) algorithm for solving 
+    the dual form of our debiasing program.
     
     Parameters
     ----------
+        X: (n,d)-array
+            The input design matrix.
+            
+        x: (d,)-array
+            The current query point.
+            
+        Pi: (n,n)-array
+            A diagonal matrix with (estimated) propensity scores as its diagonal
+            entries.
+            
         gamma_n: float
             The regularization parameter "\gamma/n". (Default: gamma_n=0.05.)
+            
+        rho: float
+            The dual parameter in ADMM.
+            
+        ll_init: (d,)-array
+            The initial value of the dual solution vector. (Default: ll_init=None.
+            Then, the vector with all-one entries is used.)
+            
+        eps: float.
+            The precision parameter for stopping the iteration. (Default: eps=1e-9.)
+            
+        max_iter: int
+            Maximum number of coordinate descent iterations. (Default: max_iter=5000.)
+            
+    Return
+    ----------
+        ll_new: (d,)-array
+            The solution vector to our dual debiasing program.
     '''
     n = X.shape[0]
     d = X.shape[1]
