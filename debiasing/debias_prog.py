@@ -36,7 +36,7 @@ def ScaledLasso(X, Y, lam0=None, return_lamb=False):
             Whether the final value of the regularization parameter is returned
             or not. (Default: return_lamb=False.)
             
-    Returns
+    Return
     ----------
         beta_est: (d,)-array
             The estimated regression coefficient by scaled Lasso.
@@ -110,7 +110,7 @@ def LassoRefit(X, Y, x, method='scaled_lasso', return_beta=False):
             Whether the final value of the estimated regression coefficient is 
             returned or not. (Default: return_beta=False.)
             
-    Returns
+    Return
     ----------
         m_refit: float
             The estimated regression function by Lasso refitting method.
