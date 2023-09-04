@@ -7,5 +7,4 @@ Function Gallery of the Debiasing Inference Method
 
 .. automodule:: debiasing.debias_prog
     :members:
-    :undoc-members:
     :show-inheritance:
