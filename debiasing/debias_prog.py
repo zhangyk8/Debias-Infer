@@ -9,6 +9,7 @@
 import numpy as np
 import scipy.stats
 from sklearn.linear_model import Lasso
+from sklearn.model_selection import KFold
 import statsmodels.api as sm
 import cvxpy as cp
 
@@ -329,6 +330,102 @@ def DualCD(X, x, Pi=None, gamma_n=0.05, ll_init=None, eps=1e-9, max_iter=5000):
             cnt = 0
             flag = 1
     return ll_new
+
+
+
+def DebiasProgCV(X, x, prop_score, gamma_lst=None, cv_fold=5, cv_rule='1se'):
+    '''
+    Our proposed Debiasing (primal) program.
+    
+    Parameters
+    ----------
+        X: (n,d)-array
+            The input design matrix.
+            
+        x: (d,)-array
+            The current query point.
+            
+        prop_score: (n,)-array
+            The (estimated) propensity scores evaluted on the covariates.
+            
+        gamma_lst: list or (m,)-array
+            The list of candidate values for the regularization parameter "\gamma/n".
+            (Default: gamma_lst=None. Then, gamma_lst contains 41 equally spacing 
+            value between 0.001 and max(abs(x)).)
+            
+        cv_fold: int
+            The number of folds for cross-validation on the dual program. 
+            (Default: cv_fold=5.)
+            
+        cv_rule: string
+            The criteria/rules for selecting the final value of the regularization 
+            parameter "\gamma/n" in the dual program. (Default: cv_rule='1se'. 
+            The candidate choices include '1se', 'minfeas', and 'mincv'.)
+            
+    Return
+    ----------
+        w_obs: (n,)-array
+            The final estimated weights by our debiasing program.
+            
+        ll_obs: (n,)-array
+            The final value of the solution to our debiasing dual program.
+            
+        gamma_n_opt: float
+            The final value of the regularization parameter "\gamma/n" selected 
+            by cross-validation.
+    '''
+    
+    if gamma_lst is None:
+        gamma_n_lst = np.linspace(0.001, np.max(abs(x)), 41)
+    
+    kf = KFold(n_splits=cv_fold, shuffle=True, random_state=0)
+    f_ind = 0
+    dual_loss = np.zeros((cv_fold, len(gamma_n_lst)))
+    for train_ind, test_ind in kf.split(X):
+        X_train = X[train_ind,:]
+        X_test = X[test_ind,:]
+        
+        prop_score_train = prop_score[train_ind]
+        prop_score_test = prop_score[test_ind]
+        
+        for j in range(len(gamma_n_lst)):
+            w_train = DebiasProg(X=X_train.copy(), x=x, Pi=np.diag(prop_score_train), gamma_n=gamma_n_lst[j])
+            if any(np.isnan(w_train)):
+                print(r'The primal debiasing program for this fold of the data is '\
+                      'not feasible when \gamma/n='+str(round(gamma_n_lst[j], 4))+'!')
+                dual_loss[f_ind, j] = np.nan
+            else:
+                ll_train = DualCD(X=X_train, x=x, Pi=np.diag(prop_score_train), gamma_n=gamma_n_lst[j], 
+                                   ll_init=None, eps=1e-8, max_iter=5000)
+                if sum(abs(w_train + np.dot(X_train, ll_train)/(2*np.sqrt(X_train.shape[0])))>1e-3) > 0:
+                    print(r'The strong duality between primal and dual programs does not satisfy '\
+                          'when \gamma/n='+str(round(gamma_n_lst[j], 4))+'!')
+                    dual_loss[f_ind, j] = np.nan
+                else:
+                    dual_loss[f_ind, j] = DualObj(X_test, x=x, Pi=np.diag(prop_score_test), 
+                                                   ll_cur=ll_train, gamma_n=gamma_n_lst[j])
+        f_ind = f_ind + 1
+    mean_dual_loss = np.mean(dual_loss, axis=0)
+    std_dual_loss = np.std(dual_loss, axis=0, ddof=1)/np.sqrt(cv_fold)
+    
+    # Different rules for choosing the tuning parameter
+    if cv_rule == 'mincv':
+        gamma_n_opt = gamma_n_lst[np.nanargmin(mean_dual_loss)]
+    if cv_rule == '1se':
+        One_SE = (mean_dual_loss > np.nanmin(mean_dual_loss) + std_dual_loss[np.nanargmin(mean_dual_loss)]) & \
+        (gamma_n_lst < gamma_n_lst[np.nanargmin(mean_dual_loss)])
+        if sum(One_SE) == 0:
+            One_SE = np.full((len(gamma_n_lst),), True)
+        gamma_n_lst = gamma_n_lst[One_SE]
+        gamma_n_opt = gamma_n_lst[np.nanargmin(mean_dual_loss[One_SE])]
+    if cv_rule == 'minfeas':
+        gamma_n_opt = np.min(gamma_n_lst[~np.isnan(mean_dual_loss)])
+        
+    # Solve the primal and dual on the original dataset
+    w_obs = DebiasProg(X=X.copy(), x=x, Pi=np.diag(prop_score), gamma_n=gamma_n_opt)
+    ll_obs = DualCD(X=X, x=x, Pi=np.diag(prop_score), gamma_n=gamma_n_opt, ll_init=None, eps=1e-9)
+    
+    return w_obs, ll_obs, gamma_n_opt
 
 
 def DualADMM(X, x, Pi=None, gamma_n=0.05, rho=1, ll_init=None, eps=1e-9):

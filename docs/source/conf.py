@@ -21,7 +21,7 @@ copyright = '2023, Yikun Zhang'
 author = 'Yikun Zhang'
 
 release = '0.1'
-version = '0.0.3'
+version = '0.0.4'
 
 # -- General configuration
 
