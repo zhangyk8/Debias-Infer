@@ -17,6 +17,7 @@ Methodology
    :caption: Contents:
    
    installation
+   Example_Debiasing
    api_reference
    
    
