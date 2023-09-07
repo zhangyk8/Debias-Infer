@@ -3,9 +3,11 @@ Welcome to the documentation of "Debias-Infer"!
 
 **Debias-Infer** is a Python library for conducting valid and efficient inference on high-dimensional linear models with missing outcomes.
 
-Methodology
+A Preview into the Proposed Debiasing Inference Method
 ------------
 
+
+More details can be found in :doc:`Methodology <method>` and the reference paper [1]_.
 
 .. note::
 
@@ -17,6 +19,7 @@ Methodology
    :caption: Contents:
    
    installation
+   method
    Example_Debiasing
    api_reference
    
