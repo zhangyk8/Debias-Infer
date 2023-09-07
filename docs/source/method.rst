@@ -50,7 +50,13 @@ As for solving the debiasing program in **Step 3**, we leverage the `CVXPY <http
     
 This dual program is solved via the coordinate descent algorithm [3]_ in our package.
 
-In the reference paper [1]_, we prove that the confidence interval in **Step 5** is asymptotically valid and our debiased estimator in **Step 4** is semi-parametrically efficient among all asymptotically linear estimators with MAR outcomes.
+In the reference paper [1]_, we prove that the confidence interval in **Step 5** is asymptotically valid and our debiased estimator in **Step 4** is semi-parametrically efficient among all asymptotically linear estimators with MAR outcomes; see Figure 1 for how our debiased estimator performs (under two different rules for the cross-validation) when compared with the Lasso estimate.
+
+.. image:: cirsym_lasso_bias_expl_x4_beta1.png
+  :alt: Debiasing method illustration
+  :class: with-shadow float-left
+
+**Figure 1**: Comparison of our debiased estimators under two different choices of the tuning parameters ("1SE" and "min-feas") with the conventional Lasso estimates based on complete-case or oracle data.
 
 References
 ----------
