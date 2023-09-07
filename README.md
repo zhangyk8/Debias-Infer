@@ -30,6 +30,6 @@ References
 
 <a name="debias">[1]</a> Y. Zhang, A. Giessing, Y.-C. Chen (2023+) Efficient Inference on High-Dimensional Linear Models with Missing Outcomes.
 
-<a name="scaledlasso">[2]</a> T. Sun and C.-H. Zhang (2012). Scaled Sparse Linear Regression." *Biometrika*, **99**, no.4: 879-898.
+<a name="scaledlasso">[2]</a> T. Sun and C.-H. Zhang (2012). Scaled Sparse Linear Regression. *Biometrika*, **99**, no.4: 879-898.
 
 
