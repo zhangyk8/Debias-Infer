@@ -18,11 +18,11 @@ where :math:`\lambda >0` is a regularization parameter.
 
 * **Step 2:** Obtain consistent estimates :math:`\hat{\pi}_i, i=1,...,n` of the propensity scores :math:`\pi_i = \mathrm{P}(R_i=1|X_i)` by any machine learning method (not necessarily a parametric model) applied on the data :math:`\{(X_i,R_i)\}_{i=1}^n \subset \mathbb{R}^d \times \{0,1\}`. See the `scikit-learn <https://scikit-learn.org/stable/>`_ package and the related `probability calibration <https://scikit-learn.org/stable/modules/calibration.html>`_ for potential propensity score estimation methods.
 
-* **Step 3:** Solve for the debiasing weight vector :math:`\hat{\bm{w}}\equiv \hat{\bm{w}}(x) = \left(\hat{w}_1(x),...,\hat{w}_n(x)\right)^T \in \mathbb{R}^n` through a debiasing program defined as:
+* **Step 3:** Solve for the debiasing weight vector :math:`\hat{\mathbf{w}}\equiv \hat{\mathbf{w}}(x) = \left(\hat{w}_1(x),...,\hat{w}_n(x)\right)^T \in \mathbb{R}^n` through a debiasing program defined as:
 
  .. math::
  
-     \min_{\bm{w}\equiv \bm{w}(x) \in \mathbb{R}^n} \left\{\sum_{i=1}^n \hat{\pi}_iw_i(x)^2: \left\|x- \frac{1}{\sqrt{n}}\sum_{i=1}^n w_i(x)\cdot \hat{\pi}_i\cdot X_i \right\|_{\infty} \leq \frac{\gamma}{n} \right\},
+     \min_{\mathbf{w}\equiv \mathbf{w}(x) \in \mathbb{R}^n} \left\{\sum_{i=1}^n \hat{\pi}_iw_i(x)^2: \left\|x- \frac{1}{\sqrt{n}}\sum_{i=1}^n w_i(x)\cdot \hat{\pi}_i\cdot X_i \right\|_{\infty} \leq \frac{\gamma}{n} \right\},
 
 where :math:`\gamma >0` is a tuning parameter.
 
@@ -30,13 +30,13 @@ where :math:`\gamma >0` is a tuning parameter.
 
 .. math::
 
-    \hat{m}^{\text{debias}}(x;\hat{\bm{w}}) = x^T \hat{\beta} + \frac{1}{\sqrt{n}} \sum_{i=1}^n \hat{w}_i(x)R_i \left(Y_i-X_i^T \hat{\beta} \right).
+    \hat{m}^{\text{debias}}(x;\hat{\mathbf{w}}) = x^T \hat{\beta} + \frac{1}{\sqrt{n}} \sum_{i=1}^n \hat{w}_i(x)R_i \left(Y_i-X_i^T \hat{\beta} \right).
 
 * **Step 5:** Construct the asymptotic :math:`(1-\alpha)`-level confidence interval for :math:`m_0(x)` as:
 
 .. math::
 
-    \left[\hat{m}^{\text{debias}}(x;\hat{\bm{w}}) - \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \hat{\pi}_i \hat{w}_i(x)^2},\; \hat{m}^{\text{debias}}(x;\hat{\bm{w}}) + \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \hat{\pi}_i \hat{w}_i(x)^2} \right],
+    \left[\hat{m}^{\text{debias}}(x;\hat{\mathbf{w}}) - \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \hat{\pi}_i \hat{w}_i(x)^2},\; \hat{m}^{\text{debias}}(x;\hat{\mathbf{w}}) + \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \hat{\pi}_i \hat{w}_i(x)^2} \right],
 
 where :math:`\Phi(\cdot)` denotes the cumulative distribution function (CDF) of :math:`\mathcal{N}(0,1)`. If :math:`\sigma_{\epsilon}^2` is unknown, then it can be replaced by any consistent estimator :math:`\hat{\sigma}_{\epsilon}^2`.
 
