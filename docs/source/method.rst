@@ -36,7 +36,7 @@ where :math:`\gamma >0` is a tuning parameter.
 
 .. math::
 
-    \left[\widehat{m}^{\text{debias}}(x;\widehat{\mathbf{w}}) - \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \widehat{\pi}_i \widehat{w}_i(x)^2},\; \widehat{m}^{\text{debias}}(x;\widehat{\mathbf{w}}) + \Phi^{-1}\left(1-\frac{\tau}{2}\right) \cdot \sigma_{\epsilon}\cdot \sqrt{\frac{1}{n}\sum_{i=1}^n \widehat{\pi}_i \widehat{w}_i(x)^2} \right],
+    \left[\widehat{m}^{\text{debias}}(x;\widehat{\mathbf{w}}) - \Phi^{-1}\left(1-\frac{\tau}{2}\right) \sigma_{\epsilon}\sqrt{\frac{1}{n}\sum_{i=1}^n \widehat{\pi}_i \widehat{w}_i(x)^2},\; \widehat{m}^{\text{debias}}(x;\widehat{\mathbf{w}}) + \Phi^{-1}\left(1-\frac{\tau}{2}\right) \sigma_{\epsilon} \sqrt{\frac{1}{n}\sum_{i=1}^n \widehat{\pi}_i \widehat{w}_i(x)^2} \right],
 
 where :math:`\Phi(\cdot)` denotes the cumulative distribution function (CDF) of :math:`\mathcal{N}(0,1)`. If :math:`\sigma_{\epsilon}^2` is unknown, then it can be replaced by any consistent estimator :math:`\widehat{\sigma}_{\epsilon}^2`.
 
