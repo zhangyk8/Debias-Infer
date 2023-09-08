@@ -9,9 +9,9 @@ where <img src="https://latex.codecogs.com/svg.latex?&space;X_i\sim\mathcal{N}_d
 
 #### Choices of Covariance Matrices
 Here, we consider three different covariance matrices <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/>:
+- <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is circulant symmetric; see Section 5.1 in Javanmard and Montarani (2014).
 - <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is toeplitz, in which <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ij}=\rho^{|i-j|}"/> with <img src="https://latex.codecogs.com/svg.latex?&space;\rho=0.9\,"/>; see Section 4 of van de Geer et al. (2014).
 - <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is equi-correlated, in which <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ij}=0.5"/> when <img src="https://latex.codecogs.com/svg.latex?&space;i\neq\,j"/> and <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma_{ii}=1\,"/>; see Section 4 of van de Geer et al. (2014).
-- <img src="https://latex.codecogs.com/svg.latex?&space;\Sigma"/> is circulant symmetric; see Section 5.1 in Javanmard and Montarani (2014).
 
 #### Choices of Noise Distributions
 As for the noise distribution, we consider four different choices:
@@ -22,19 +22,19 @@ As for the noise distribution, we consider four different choices:
 
 #### Choices of the True Regression Coefficient <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0"/>
 We also specify three different choices for <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0"/>:
-- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0=(\underbrace{\sqrt{5},...,\sqrt{5}}_{5},0,...,0)^T\in\mathbb{R}^d"/> is sparse.
-- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\propto\left(1,\frac{1}{\sqrt{2}},...,\frac{1}{\sqrt{d}}\right)^T\in\mathbb{R}^d"/> is dense.
-- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\propto\left(1,\frac{1}{2},...,\frac{1}{d}\right)^T\in\mathbb{R}^d"/> is pseudo-dense.
+- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0^{(0)}=(\underbrace{\sqrt{5},...,\sqrt{5}}_{5},0,...,0)^T\in\mathbb{R}^d"/> is sparse.
+- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0^{(1)}\propto\left(1,\frac{1}{\sqrt{2}},...,\frac{1}{\sqrt{d}}\right)^T\in\mathbb{R}^d"/> is dense.
+- <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0^{(2)}\propto\left(1,\frac{1}{2},...,\frac{1}{d}\right)^T\in\mathbb{R}^d"/> is pseudo-dense.
 
 In the latter two cases, we normalize <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/> so that it has the norm <img src="https://latex.codecogs.com/svg.latex?&space;\|\beta_0\|_2=5"/>.
 
 #### Choices of the Query Point <img src="https://latex.codecogs.com/svg.latex?&space;x"/>
 To infer the regression function <img src="https://latex.codecogs.com/svg.latex?&space;m(x)=x^T\beta_0"/>, we experiment on four different choices of the query point <img src="https://latex.codecogs.com/svg.latex?&space;x"/>:
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=(1,0,...,0)^T\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the first coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2},\frac{1}{4},0,0,0,\frac{1}{2},\frac{1}{8},0,...,0\right)\in\mathbb{R}^d"/>.
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=(0,...,0,\underbrace{1}_{100^{th}},0,...,0)\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the 100-th coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2},...,\frac{1}{d}\right)\in\mathbb{R}^d"/>. 
-- <img src="https://latex.codecogs.com/svg.latex?&space;x=\left(1,\frac{1}{2^2},...,\frac{1}{d^2}\right)\in\mathbb{R}^d"/>. 
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(0)}=(1,0,...,0)^T\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the first coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(1)}=\left(1,\frac{1}{2},\frac{1}{4},0,0,0,\frac{1}{2},\frac{1}{8},0,...,0\right)\in\mathbb{R}^d"/>.
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(2)}=(0,...,0,\underbrace{1}_{100^{th}},0,...,0)\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the 100-th coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(3)}=\left(1,\frac{1}{2},...,\frac{1}{d}\right)\in\mathbb{R}^d"/>. 
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(4)}=\left(1,\frac{1}{2^2},...,\frac{1}{d^2}\right)\in\mathbb{R}^d"/>. 
 
 
 For the comparative studies, we compare our debiased framework with the following four existing methods:
