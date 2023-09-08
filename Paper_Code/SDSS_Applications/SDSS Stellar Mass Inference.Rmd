@@ -1,0 +1,172 @@
+---
+title: "SDSS Stellar Mass Inference"
+author: "Yikun Zhang"
+date: "2023-07-23"
+output: html_document
+---
+
+```{r}
+library(glmnet)
+library(scalreg)
+library(pracma)
+library(MASS)
+library(caret)
+source("../debias_prog.R")
+```
+
+
+```{r}
+dat = read.csv("HighD_dat_final.csv", header = TRUE)
+X = as.matrix(dat[,1:(dim(dat)[2] - 1)])
+Y = dat[,dim(dat)[2]]
+log_Y = log(Y)
+R = as.numeric(Y > 0)
+mean(R)
+```
+
+## Lasso pilot estimator
+
+```{r}
+start_time = Sys.time()
+lasso_pilot = scalreg(X[R == 1,], log_Y[R == 1], lam0 = "univ", LSE = FALSE)
+beta_pilot = lasso_pilot$coefficients
+sigma_pilot = lasso_pilot$hsigma
+print(Sys.time() - start_time)
+
+# lasso_fit = glmnet(X[R == 1,], log_Y[R == 1], family = "gaussian", alpha = 1, nlambda = 100)
+# lasso_cv = cv.glmnet(X[R == 1,], log_Y[R == 1], family = "gaussian", alpha = 1, nfolds = 10)
+
+# a = c(beta_pilot, sigma_pilot)
+# write.csv(a, "lasso_pilot_x1.csv", row.names = FALSE)
+```
+
+## Propensity score estimation (logistic regression CV)
+
+```{r}
+d = dim(X)[2]
+n = dim(X)[1]
+zeta = 10^seq(-1, log10(300), length.out = 40) * sqrt(log(d) / n)
+lr = cv.glmnet(X, R, family = 'binomial', alpha = 1, type.measure = 'deviance', 
+                lambda = zeta, nfolds = 5, parallel = FALSE)
+lr = glmnet(X, R, family = "binomial", alpha = 1, lambda = lr$lambda.min, 
+            standardize = TRUE, thresh=1e-6)
+prop_score = drop(predict(lr, newx = X, type = 'response'))
+
+# write.csv(prop_score, "prop_score_x1.csv", row.names = FALSE)
+```
+
+## Debiased Program
+
+```{r}
+x = rep(0, d)
+x[c(3:5)] = 1
+x = array(x, dim = c(1,d))
+
+gamma_n_lst = seq(0.001, max(abs(x)), length.out = 41)
+cv_fold = 5
+kf = createFolds(1:n, cv_fold, list = FALSE, returnTrain = TRUE)
+dual_loss = matrix(0, nrow = cv_fold, ncol = length(gamma_n_lst))
+f_ind = 1
+for (fold in 1:cv_fold) {
+    train_ind <- (kf != fold)
+    test_ind <- (kf == fold)
+    X_train <- X[train_ind, ]
+    X_test <- X[test_ind, ]
+    prop_score_train <- prop_score[train_ind]
+    prop_score_test <- prop_score[test_ind]
+      
+    for (j in 1:length(gamma_n_lst)) {
+      w_train = DebiasProg(X_train, x, diag(prop_score_train), gamma_n = gamma_n_lst[j])
+      if (any(is.na(w_train))) {
+        cat("The primal debiasing program for this fold of the data is not feasible when gamma/n =",
+        round(gamma_n_lst[j], 4), "!\n")
+        dual_loss[f_ind, j] = NA
+    } else {
+      ll_train = DualCD(X_train, x, diag(prop_score_train), gamma_n_lst[j], ll_init = NULL, eps = 1e-8, max_iter = 5000)
+      if (sum(abs(w_train + drop(X_train %*% ll_train) / (2 * sqrt(dim(X_train)[1]))) > 1e-3) > 0) {
+        cat("The strong duality between primal and dual programs does not satisfy when gamma/n =", round(gamma_n_lst[j], 4), "!\n")
+        dual_loss[f_ind, j] = NA
+      } else {
+        dual_loss[f_ind, j] = DualObj(X_test, x, diag(prop_score_test), ll_cur = ll_train, gamma_n = gamma_n_lst[j])
+      }
+    }
+  }
+  f_ind = f_ind + 1
+}
+
+mean_dual_loss = apply(dual_loss, 2, mean, na.rm = FALSE)
+std_dual_loss = apply(dual_loss, 2, function(x) sd(x, na.rm = FALSE)) / sqrt(cv_fold)
+    
+# Different rules for choosing the tuning parameter
+para_rule = c('1se', 'mincv', 'minfeas')
+for (rule in para_rule) {
+  if (rule == 'mincv') {
+    gamma_n_opt = gamma_n_lst[which.min(mean_dual_loss)]
+  }
+  if (rule == '1se') {
+    One_SE = (mean_dual_loss > min(mean_dual_loss, na.rm = TRUE) + std_dual_loss[which.min(mean_dual_loss)]) &
+          (gamma_n_lst < gamma_n_lst[which.min(mean_dual_loss)])
+    if (sum(One_SE, na.rm = TRUE) == 0) {
+          One_SE = rep(TRUE, length(gamma_n_lst))
+    }
+    gamma_n_lst = gamma_n_lst[One_SE]
+    gamma_n_opt = gamma_n_lst[which.min(mean_dual_loss[One_SE])]
+  }
+  if (rule == 'minfeas') {
+    gamma_n_opt <- min(gamma_n_lst[!is.na(mean_dual_loss)])
+  }
+  
+  # Solve the primal and dual on the original dataset
+  w_obs = DebiasProg(X, x, diag(prop_score), gamma_n_opt)
+  ll_obs = DualCD(X, x, diag(prop_score), gamma_n_opt, ll_init = NULL, eps = 1e-8, max_iter = 5000)
+      
+  # Store the results
+  m_deb = sum(x * beta_pilot) + sum(w_obs * R * (log_Y - X %*% beta_pilot)) / sqrt(n)
+  asym_var = sqrt(sum(prop_score * w_obs^2) / n)
+  sigma_hat = sigma_pilot
+      
+  debias_res = data.frame(m_deb = m_deb, asym_var = asym_var, sigma_hat = sigma_hat)
+  write.csv(debias_res, paste0("./SDSS_dist_inf_x1_rule", rule, ".csv"), row.names=FALSE)
+}
+```
+
+
+## Debiased Lasso (Javanmard & Montanari, 2014)
+
+```{r}
+source('../sslasso_code/lasso_inference.R')
+
+logY_obs = log_Y[R == 1]
+logY_obs = as.matrix(logY_obs, ncol = 1)
+X_obs = X[R == 1,]
+
+d = dim(X_obs)[2]
+
+debl_obs = SSLasso(X_obs, logY_obs, alpha = 0.05, lambda = NULL, 
+                   mu = 2*sqrt(log(d)/length(logY_obs)), intercept = FALSE, resol=1.3, 
+                   maxiter=1000, threshold=1e-3, verbose = FALSE)
+```
+
+```{r}
+library(hdi)
+
+delasso_obs = lasso.proj(X_obs, logY_obs, family = "gaussian", standardize = FALSE, 
+                               parallel = TRUE, ncores = 20, betainit = "scaled lasso", 
+                               return.Z = TRUE, suppress.grouptesting = TRUE, robust = FALSE)
+
+deridge_obs = ridge.proj(X_obs, logY_obs, family = "gaussian", standardize = FALSE, 
+                               lambda = 1, betainit = "scaled lasso", 
+                               suppress.grouptesting = TRUE)
+deridge_obs$sigmahat
+ci_deridge = confint(deridge_obs, level = 0.95)
+ci_deridge2 = confint(deridge_obs, level = 0.9)
+```
+
+```{r}
+ci_deridge[3,]
+ci_deridge2[3,]
+
+write.csv(ci_deridge, 'ridge_proj_95.csv', row.names=FALSE)
+write.csv(ci_deridge2, 'ridge_proj_90.csv', row.names=FALSE)
+```
+
