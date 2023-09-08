@@ -171,7 +171,7 @@ for i in range(5):
                 print(b)
                 continue
             cnt += 1
-            if cnt >= 200:
+            if cnt >= 500:
                 break
         lproj_res1.to_csv('./Results/lproj_AR_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
                           +str(k)+'.csv', index=False)
