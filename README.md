@@ -9,7 +9,7 @@ This package implements the proposed debiasing method for conducting valid infer
 
 * Free software: MIT license
 * Python Package Documentation: [https://debias-infer.readthedocs.io](https://debias-infer.readthedocs.io).
-
+* You may also consider using our R package [DebiasInfer](https://cran.r-project.org/web/packages/DebiasInfer/index.html), though the Python package will be computationally faster.
 
 Installation guide
 --------
