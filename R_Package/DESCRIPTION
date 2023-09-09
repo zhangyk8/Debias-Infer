@@ -6,7 +6,9 @@ Authors@R: c(
     person("Yikun", "Zhang", email = "yikunzhang@foxmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3905-6346")),
     person("Alexander", "Giessing", email = "giessing@uw.edu", role = "aut", comment = c(ORCID = "0000-0002-6917-0652")),
     person("Yen-Chi", "Chen", email = "yenchic@uw.edu", role = "aut", comment = c(ORCID = "0000-0002-4485-306X")))
-Description: What the package does (one paragraph).
+Description: This package implements a statistically and computationally efficient 
+    debiasing method for conducting valid inference on the high-dimensional linear 
+    regression function with missing outcomes.
 URL: https://github.com/zhangyk8/Debias-Infer/
 BugReports: https://github.com/zhangyk8/Debias-Infer/issues
 License: MIT + file LICENSE
