@@ -9,7 +9,7 @@
 #' @return The resulting vector after soft-thresholding.
 #'
 #' @author Yikun Zhang, \email{yikunzhang@@foxmail.com}
-#' @keywords utility function
+#' @keywords utility
 #'
 #' @examples
 #' a = c(1,2,4,6)

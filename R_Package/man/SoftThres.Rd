@@ -26,5 +26,4 @@ SoftThres(theta=a, lamb=3)
 \author{
 Yikun Zhang, \email{yikunzhang@foxmail.com}
 }
-\keyword{function}
 \keyword{utility}
