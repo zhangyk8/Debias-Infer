@@ -14,6 +14,7 @@
 #' @references Zhang, Y., Giessing, A. and Chen, Y.-C. (2023)
 #' \emph{Efficient Inference on High-Dimensional Linear Model with Missing Outcomes.}
 #' \url{https://arxiv.org/abs/2309.06429}.
+#'
 #' Fu, A., Narasimhan, B. and Boyd, S. (2017) \emph{CVXR: An R Package for Disciplined Convex Optimization.
 #' Journal of Statistical Software 94 (14): 1–34.} \doi{10.18637/jss.v094.i14}.
 #' @keywords program primal debiasing
