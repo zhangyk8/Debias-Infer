@@ -103,13 +103,13 @@ DebiasProgCV = function(X, x, prop_score, gamma_lst = NULL, cv_fold = 5,
       w_train = DebiasProg(X = X_train, x = x, Pi = diag(prop_score_train), gamma_n = gamma_lst[j])
 
       if (any(is.na(w_train))) {
-        cat(paste("The primal debiasing program for this fold of the data is not feasible when gamma/n=", round(gamma_lst[j], 4), "!\n"))
+        message(paste("The primal debiasing program for this fold of the data is not feasible when gamma/n=", round(gamma_lst[j], 4), "!\n"))
         dual_loss[f_ind, j] = NA
       } else {
         ll_train = DualCD(X = X_train, x = x, Pi = diag(prop_score_train), gamma_n = gamma_lst[j], ll_init = NULL, eps = 1e-8, max_iter = 5000)
 
         if (sum(abs(w_train + drop(X_train %*% ll_train) / (2 * sqrt(dim(X_train)[1]))) > 1e-3) > 0) {
-          cat(paste("The strong duality between primal and dual programs does not satisfy when gamma/n=", round(gamma_lst[j], 4), "!\n"))
+        warning(paste("The strong duality between primal and dual programs does not satisfy when gamma/n=", round(gamma_lst[j], 4), "!\n"))
           dual_loss[f_ind, j] = NA
         } else {
           dual_loss[f_ind, j] = DualObj(X_test, x = x, Pi = diag(prop_score_test), ll_cur = ll_train, gamma_n = gamma_lst[j])

@@ -87,16 +87,17 @@ DebiasProg = function(X, x, Pi, gamma_n = 0.1) {
 
   tryCatch({
     if(res$value == Inf) {
-      print("The primal debiasing program is infeasible!")
+      message("The primal debiasing program is infeasible! Returning 'NA'...")
       return(matrix(NA, nrow = n, ncol = 1))
     } else if (sum(res[[1]] == "solver_error") > 0){
+      warning("The 'CVXR' fails to solve this program! Returning 'NA'...")
       return(matrix(NA, nrow = n, ncol = 1))
     }
     else {
       return(res$getValue(w))
     }
   }, error = function(e){
-    print("The 'CVXR' fails to solve this program!")
+    warning("The 'CVXR' fails to solve this program! Returning 'NA'...")
     return(matrix(NA, nrow = n, ncol = 1))
   })
 }

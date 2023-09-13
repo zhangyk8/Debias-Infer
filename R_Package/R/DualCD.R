@@ -106,8 +106,8 @@ DualCD = function(X, x, Pi=NULL, gamma_n=0.05, ll_init=NULL, eps=1e-9,
     }
 
     if ((cnt > max_iter) && (flag == 0)) {
-      print(paste0("The coordinate descent algorithm has reached its maximum number of iterations: ",
-                   max_iter, "!"))
+      warning(paste0("The coordinate descent algorithm has reached its maximum number of iterations: ",
+                   max_iter, "! Reiterate one more times without small perturbations to the scaled design matrix..."))
       A <- A + 1e-9 * diag(d)
       cnt <- 0
       flag <- 1
