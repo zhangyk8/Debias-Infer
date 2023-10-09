@@ -1,7 +1,7 @@
 Package: DebiasInfer
 Type: Package
 Title: Efficient Inference on High-Dimensional Linear Model with Missing Outcomes
-Version: 0.1
+Version: 0.2
 Authors@R: c(
     person("Yikun", "Zhang", email = "yikunzhang@foxmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3905-6346")),
     person("Alexander", "Giessing", email = "giessing@uw.edu", role = "aut", comment = c(ORCID = "0000-0002-6917-0652")),
@@ -15,7 +15,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports:
-    scalreg,
     CVXR,
     caret,
     stats
