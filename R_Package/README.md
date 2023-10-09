@@ -23,6 +23,9 @@ devtools::install_github("zhangyk8/Debias-Infer", subdir = "R_Package")
 ```R
 require(MASS)
 require(glmnet)
+require(scalreg)
+require(DebiasInfer)
+
 d = 1000
 n = 900
 
@@ -57,14 +60,29 @@ obs_prob = 1 / (1 + exp(-1 + X_sim[, 7] - X_sim[, 8]))
 R_sim = rep(1, n)
 R_sim[runif(n) >= obs_prob] = 0
 
-## Estimate the propensity scores via the Lasso-type generalized linear model
-zeta = 5*sqrt(log(d)/n)/n
-lr1 = glmnet(X_sim, R_sim, family = "binomial", alpha = 1, lambda = zeta,
-             standardize = TRUE, thresh=1e-6)
-prop_score = drop(predict(lr1, newx = X_sim, type = "response"))
+## Lasso Pilot Estimate
+lasso_pilot = scalreg(X_sim[R_sim == 1,], Y_sim[R_sim == 1], lam0 = "univ", LSE = FALSE)
+beta_pilot = lasso_pilot$coefficients
+sigma_pilot = lasso_pilot$hsigma
 
-## Estimate the debiasing weights with the tuning parameter selected by cross-validations.
-deb_res = DebiasProgCV(X_sim, x_cur, prop_score, gamma_lst = c(0.1, 0.5, 1),
+## Estimate the propensity scores via the Lasso-type generalized linear model with cross-validations
+zeta = 10^seq(-1, log10(300), length.out = 40) * sqrt(log(d) / n)
+lr1 = cv.glmnet(X_sim, R_sim, family = 'binomial', alpha = 1, type.measure = 'deviance', 
+                lambda = zeta, nfolds = 5, parallel = TRUE)
+lr1 = glmnet(X_sim, R_sim, family = "binomial", alpha = 1, lambda = lr1$lambda.min, 
+             standardize = TRUE, thresh=1e-6)
+prop_score = drop(predict(lr1, newx = X_sim, type = 'response'))
+
+## Estimate the debiasing weights with the tuning parameter selected by cross-validations
+deb_res = DebiasProgCV(X_sim, x_cur, prop_score, gamma_lst = c(0.4, 0.6, 0.8, 1),
                        cv_fold = 5, cv_rule = '1se')
+
+## Construct the 95% confidence intervals for the true regression function
+m_deb = sum(x_cur %*% beta_pilot) + sum(deb_res$w_obs * R_sim * (Y_sim - X_sim %*% beta_pilot)) / sqrt(n)
+asym_sd = sqrt(sum(prop_score * deb_res$w_obs^2) / n)
+
+cat("The 95% confidence interval yielded by our debiasing method is [",
+    m_deb - asym_sd*sigma_pilot*qnorm(1-0.05/2), ", ",
+    m_deb + asym_sd*sigma_pilot*qnorm(1-0.05/2), "].\n", sep = "")
 ```
 
