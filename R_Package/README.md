@@ -52,6 +52,7 @@ beta_0 = rep(0, d)
 beta_0[1:s_beta] = sqrt(5)
 
 ## Generate the design matrix and outcomes
+set.seed(123)
 X_sim = mvrnorm(n, mu = rep(0, d), Sigma)
 eps_err_sim = sig * rnorm(n)
 Y_sim = drop(X_sim %*% beta_0) + eps_err_sim
@@ -74,7 +75,7 @@ lr1 = glmnet(X_sim, R_sim, family = "binomial", alpha = 1, lambda = lr1$lambda.m
 prop_score = drop(predict(lr1, newx = X_sim, type = 'response'))
 
 ## Estimate the debiasing weights with the tuning parameter selected by cross-validations
-deb_res = DebiasProgCV(X_sim, x_cur, prop_score, gamma_lst = c(0.4, 0.6, 0.8, 1),
+deb_res = DebiasProgCV(X_sim, x_cur, prop_score, gamma_lst = c(0.2, 0.4, 0.6, 1),
                        cv_fold = 5, cv_rule = '1se')
 
 ## Construct the 95% confidence intervals for the true regression function
