@@ -187,7 +187,7 @@ for i in [0,1,2,4]:
                         continue
                         
                 deb_prog_1se = pd.DataFrame({'m_deb2': m_deb2_1se, 'asym_se2': asym_se2_1se, 
-                                             'sigma_hat2': sigma_hat2_1se, 'mae_prop': MAE_prop_1se})
+                                              'sigma_hat2': sigma_hat2_1se, 'mae_prop': MAE_prop_1se})
                 deb_prog_1se.to_csv('./Results/DebiasProg_Cirsym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
                                     '_x'+str(i)+'_beta'+str(k)+'_prop_'+str(non_met)+'_'+str(rule)+'_mis.csv', 
                                     index=False)
@@ -203,14 +203,14 @@ for i in range(5):
             for b in range(1, B+1):
                 try:
                     debias = pd.read_csv('./debias_res/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'_n'+str(n)+\
-                                 '_'+str(b)+'_x'+str(i)+'_beta'+str(k)+'_rule'+rule+'_gauss_R.csv')
+                                  '_'+str(b)+'_x'+str(i)+'_beta'+str(k)+'_rule'+rule+'_gauss_R.csv')
                     debias_res1 = pd.concat([debias_res1, debias])
                 except:
                     print('Gaussian R')
                     print(b)
                     continue
             debias_res1.to_csv('./Results/DebiasProg_CirSym_cov_homoerr_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
-                             +str(k)+'_'+rule+'_gauss_R.csv', index=False)
+                              +str(k)+'_'+rule+'_gauss_R.csv', index=False)
 
 
 # ## Debiased Lasso (Javanmard and Montarani, 2014)
@@ -268,14 +268,44 @@ for i in range(5):
                                 +str(i)+'_beta'+str(k)+'.csv')
                 lproj_res1 = pd.concat([lproj_res1, lproj])
             except:
-                print('DL-Van')
+                print('DL-Van Gaussian')
                 print(b)
                 continue
-            cnt += 1
-            if cnt >= 500:
-                break
+            # cnt += 1
+            # if cnt >= 500:
+            #     break
         lproj_res1.to_csv('./Results/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
                           +str(k)+'.csv', index=False)
+            
+        ## t-dist noise
+        lproj_res1 = pd.DataFrame()
+        B = 1000
+        for b in range(1, B+1):
+            try:
+                lproj = pd.read_csv('./lproj_res/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_'+str(b)+'_x'
+                                +str(i)+'_beta'+str(k)+'_terr.csv')
+                lproj_res1 = pd.concat([lproj_res1, lproj])
+            except:
+                print('DL-Van t-err')
+                print(b)
+                continue
+        lproj_res1.to_csv('./Results/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
+                          +str(k)+'_terr.csv', index=False)
+            
+        ## laplace noise
+        lproj_res1 = pd.DataFrame()
+        B = 1000
+        for b in range(1, B+1):
+            try:
+                lproj = pd.read_csv('./lproj_res/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_'+str(b)+'_x'
+                                +str(i)+'_beta'+str(k)+'_laperr.csv')
+                lproj_res1 = pd.concat([lproj_res1, lproj])
+            except:
+                print('DL-Van lap-err')
+                print(b)
+                continue
+        lproj_res1.to_csv('./Results/lproj_cirsym_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
+                          +str(k)+'_laperr.csv', index=False)
 
 
 
