@@ -62,7 +62,7 @@ for i in range(5):
                                 index=False)
                 
 
-## Proposed debiased program (other types of noises)
+# ## Proposed debiased program (other types of noises)
 for i in range(5):
     for k in range(3):
         # Different rules for choosing the tuning parameter
@@ -112,7 +112,7 @@ for i in range(5):
         
 
 
-## Debiased Lasso (Javanmard and Montarani, 2014)
+# ## Debiased Lasso (Javanmard and Montarani, 2014)
 for i in range(5):
     for k in range(3):
         debl_res1 = pd.DataFrame()
@@ -170,11 +170,31 @@ for i in range(5):
                 print('DL-Van')
                 print(b)
                 continue
-            cnt += 1
-            if cnt >= 500:
-                break
+            # cnt += 1
+            # if cnt >= 500:
+            #     break
         lproj_res1.to_csv('./Results/lproj_AR_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
                           +str(k)+'.csv', index=False)
+            
+        ## t-dist noise
+        lproj_res1 = pd.DataFrame()
+        B = 1000
+        for b in range(1, B+1):
+            lproj = pd.read_csv('./lproj_res/lproj_AR_d'+str(d)+'_n'+str(n)+'_'+str(b)+'_x'
+                                +str(i)+'_beta'+str(k)+'_terr.csv')
+            lproj_res1 = pd.concat([lproj_res1, lproj])
+        lproj_res1.to_csv('./Results/lproj_AR_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
+                          +str(k)+'_terr.csv', index=False)
+            
+        ## laplace noise
+        lproj_res1 = pd.DataFrame()
+        B = 1000
+        for b in range(1, B+1):
+            lproj = pd.read_csv('./lproj_res/lproj_AR_d'+str(d)+'_n'+str(n)+'_'+str(b)+'_x'
+                                +str(i)+'_beta'+str(k)+'_laperr.csv')
+            lproj_res1 = pd.concat([lproj_res1, lproj])
+        lproj_res1.to_csv('./Results/lproj_AR_d'+str(d)+'_n'+str(n)+'_x'+str(i)+'_beta'\
+                          +str(k)+'_laperr.csv', index=False)
 
 
 
