@@ -45,7 +45,7 @@ for i in range(d):
 sig = 1
 
 ## Consider different simulation settings
-for i in range(5):
+for i in range(6):
     if i == 0:
         ## x0
         x = np.zeros((d,))
@@ -68,6 +68,9 @@ for i in range(5):
     if i == 4:
         ## x4
         x = 1/np.linspace(1, d, d)**2
+    if i == 5:
+        ## x5
+        x = np.ones((d,))/np.sqrt(d)
     for k in range(3):
         if k == 0:
             s_beta = 5
@@ -84,9 +87,6 @@ for i in range(5):
         m_true = np.dot(x, beta_0)
         
         np.random.seed(job_id)
-
-        # True regression function
-        m_true = np.dot(x, beta_0)
         
         # Significance level
         alpha = 0.05

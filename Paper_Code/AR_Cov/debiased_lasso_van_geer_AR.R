@@ -18,7 +18,7 @@ for(i in 1:(d-1)){
 }
 sig = 1
 
-for(i in 0:4){
+for(i in 0:5){
   if(i == 0){
     ## x0
     x = array(0, dim = c(d,1))
@@ -45,6 +45,10 @@ for(i in 0:4){
   if(i == 4){
     x = array(0, dim = c(d,1))
     x[,1] = 1/seq(1, d, by = 1)^2
+  }
+  if (i == 5){
+    x = array(0, dim = c(d,1))
+    x[,1] = rep(1/sqrt(d), d)
   }
   
   for(k in 0:2){
