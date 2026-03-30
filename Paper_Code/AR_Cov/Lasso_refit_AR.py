@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 @author: Yikun Zhang
-Last Editing: May 13, 2023
+Last Editing: Mar 29, 2026
 
 Description: Lasso refitting (Autoregressive covariance with Gaussian noises).
 """
