@@ -31,8 +31,9 @@
 #' \donttest{
 #'   require(MASS)
 #'   require(glmnet)
-#'   d = 1000
-#'   n = 900
+#'   d = 600
+#'   n = 500
+#'   set.seed(123)
 #'
 #'   Sigma = array(0, dim = c(d,d)) + diag(d)
 #'   rho = 0.1
@@ -87,7 +88,19 @@ DebiasProgCV = function(X, x, prop_score, gamma_lst = NULL, cv_fold = 5,
     gamma_lst = seq(0.001, max(abs(x)), length.out = 41)
   }
 
-  kf = createFolds(1:n, cv_fold, list = FALSE, returnTrain = TRUE)
+  if (length(gamma_lst) == 0L) {
+    stop("'gamma_lst' must contain at least one candidate value.")
+  }
+
+  if (length(prop_score) != n) {
+    stop("'prop_score' must have length nrow(X).")
+  }
+
+  if (!all(dim(x) == c(1, ncol(X)))) {
+    stop("'x' must be a 1 x d matrix where d = ncol(X).")
+  }
+
+  kf = createFolds(1:n, k = cv_fold, list = FALSE, returnTrain = FALSE)
   dual_loss = matrix(0, nrow = cv_fold, ncol = length(gamma_lst))
   f_ind = 1
 
@@ -100,7 +113,8 @@ DebiasProgCV = function(X, x, prop_score, gamma_lst = NULL, cv_fold = 5,
     prop_score_test <- prop_score[test_ind]
 
     for (j in 1:length(gamma_lst)) {
-      w_train = DebiasProg(X = X_train, x = x, Pi = diag(prop_score_train), gamma_n = gamma_lst[j])
+      w_train = DebiasProg(X = X_train, x = x, Pi = diag(prop_score_train),
+                           gamma_n = gamma_lst[j])
 
       if (any(is.na(w_train))) {
         message(paste("The primal debiasing program for this fold of the data is not feasible when gamma/n=", round(gamma_lst[j], 4), "!\n"))

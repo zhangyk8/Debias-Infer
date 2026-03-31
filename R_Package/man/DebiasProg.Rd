@@ -26,8 +26,9 @@ the weights for correcting the Lasso pilot estimate.
 \donttest{
   require(MASS)
   require(glmnet)
-  d = 1000
-  n = 900
+  d = 600
+  n = 500
+  set.seed(123)
 
   Sigma = array(0, dim = c(d,d)) + diag(d)
   rho = 0.1

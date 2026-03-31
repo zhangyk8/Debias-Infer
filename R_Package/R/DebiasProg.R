@@ -23,8 +23,9 @@
 #' \donttest{
 #'   require(MASS)
 #'   require(glmnet)
-#'   d = 1000
-#'   n = 900
+#'   d = 600
+#'   n = 500
+#'   set.seed(123)
 #'
 #'   Sigma = array(0, dim = c(d,d)) + diag(d)
 #'   rho = 0.1
@@ -72,32 +73,46 @@
 #'
 DebiasProg = function(X, x, Pi, gamma_n = 0.1) {
   n = dim(X)[1]
-  w = Variable(rows = n, cols = 1)
+  # w = Variable(rows = n, cols = 1)
+  w = Variable(shape = c(n, 1))
   debias_obj = Minimize(quad_form(w, Pi))
   constraints = list(x - (1/sqrt(n))*(t(w) %*% Pi %*% X) <= gamma_n,
                      x - (1/sqrt(n))*(t(w) %*% Pi %*% X) >= -gamma_n)
   debias_prog = Problem(debias_obj, constraints)
 
   tryCatch({
-    res = psolve(debias_prog)
-  }, error = function(e) {
-    # res = psolve(debias_prog, solver = "MOSEK", max_iters = 30000)
-    return(matrix(NA, nrow = n, ncol = 1))
-  })
+    obj_val = psolve(debias_prog, solver = "CLARABEL",
+                     feastol = 1e-8, reltol = 1e-8, abstol = 1e-8)
+  }, error = function(e) e)
 
-  tryCatch({
-    if(res$value == Inf) {
-      message("The primal debiasing program is infeasible! Returning 'NA'...")
-      return(matrix(NA, nrow = n, ncol = 1))
-    } else if (sum(res[[1]] == "solver_error") > 0){
-      warning("The 'CVXR' fails to solve this program! Returning 'NA'...")
-      return(matrix(NA, nrow = n, ncol = 1))
-    }
-    else {
-      return(res$getValue(w))
-    }
-  }, error = function(e){
-    warning("The 'CVXR' fails to solve this program! Returning 'NA'...")
-    return(matrix(NA, nrow = n, ncol = 1))
-  })
+  if (inherits(obj_val, "error")) {
+    warning("CVXR failed to solve this program; returning NA.")
+    return(matrix(NA_real_, nrow = n, ncol = 1))
+  }
+
+  stat <- CVXR::status(debias_prog)
+
+  if (is.null(stat) || stat %in% c("solver_error", "error")) {
+    warning("The solver reported an error; returning NA.")
+    return(matrix(NA_real_, nrow = n, ncol = 1))
+  }
+
+  if (stat %in% c("infeasible", "infeasible_inaccurate")) {
+    message("The primal debiasing program is infeasible! Returning NA...")
+    return(matrix(NA_real_, nrow = n, ncol = 1))
+  }
+
+  if (!is.finite(obj_val)) {
+    warning("Non-finite objective value returned; returning NA.")
+    return(matrix(NA_real_, nrow = n, ncol = 1))
+  }
+
+  w_val <- tryCatch(CVXR::value(w), error = function(e) NULL)
+
+  if (is.null(w_val)) {
+    warning("Could not extract variable value; returning NA.")
+    return(matrix(NA_real_, nrow = n, ncol = 1))
+  }
+
+  return(w_val)
 }
