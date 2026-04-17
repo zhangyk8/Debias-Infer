@@ -5,7 +5,7 @@
 Last Editing: Mar 28, 2026
 
 Description: Simulations on the AIPW estimator in Tian et al. (2024) 
-(https://arxiv.org/pdf/2406.13906) (Toeplitz covariance AR(1) with Gaussian noises)
+(https://arxiv.org/pdf/2406.13906) (Toeplitz covariance AR(1) with t2 and Laplace noises)
 """
 
 import numpy as np
@@ -258,30 +258,36 @@ for i in range(6):
     x = make_query_x(d, i)
 
     for k in range(3):
-        beta_0 = make_beta0(d, k)
+        for err in ['terr', 'laperr']:
+            beta_0 = make_beta0(d, k)
 
-        # True regression function
-        m_true = np.dot(x, beta_0)
+            # True regression function
+            m_true = np.dot(x, beta_0)
 
-        np.random.seed(job_id)
+            np.random.seed(job_id)
 
-        X_sim = np.random.multivariate_normal(mean=np.zeros(d), cov=Sigma, size=n)
-        eps_err_sim = sig * np.random.randn(n)
-        Y_sim = np.dot(X_sim, beta_0) + eps_err_sim
+            X_sim = np.random.multivariate_normal(mean=np.zeros(d), cov=Sigma, size=n)
+            if err == 'terr':
+                eps_err_sim = np.random.standard_t(df=2, size=n)
+            elif err == 'laperr':
+                eps_err_sim = np.random.laplace(loc=0, scale=1/np.sqrt(2), size=n)
+            else:
+                raise ValueError(f"Unknown error type: {err}")
+            Y_sim = np.dot(X_sim, beta_0) + eps_err_sim
 
-        ## MCAR
-        obs_prob1 = 0.7
-        R1 = np.random.choice([0, 1], size=n, replace=True, p=[1 - obs_prob1, obs_prob1])
+            ## MCAR
+            obs_prob1 = 0.7
+            R1 = np.random.choice([0, 1], size=n, replace=True, p=[1 - obs_prob1, obs_prob1])
 
-        ## MAR
-        obs_prob2 = 1 / (1 + np.exp(-1 + X_sim[:, 6] - X_sim[:, 7]))
-        R2 = np.ones((n,))
-        R2[np.random.rand(n) >= obs_prob2] = 0
+            ## MAR
+            obs_prob2 = 1 / (1 + np.exp(-1 + X_sim[:, 6] - X_sim[:, 7]))
+            R2 = np.ones((n,))
+            R2[np.random.rand(n) >= obs_prob2] = 0
 
-        ## Tian et al. method
-        res1 = fit_one(X_sim, Y_sim, R1, x)
-        res2 = fit_one(X_sim, Y_sim, R2, x)
+            ## Tian et al. method
+            res1 = fit_one(X_sim, Y_sim, R1, x)
+            res2 = fit_one(X_sim, Y_sim, R2, x)
 
-        save_same_format(out_dir, f"Tian2024_AR_cov_homoerr_d{d}n{n}_MCAR", job_id, i, k, res1)
+            save_same_format(out_dir, f"Tian2024_AR_cov_homoerr_d{d}n{n}_MCAR_{err}", job_id, i, k, res1)
 
-        save_same_format(out_dir, f"Tian2024_AR_cov_homoerr_d{d}n{n}_MAR", job_id, i, k, res2)
+            save_same_format(out_dir, f"Tian2024_AR_cov_homoerr_d{d}n{n}_MAR_{err}", job_id, i, k, res2)
