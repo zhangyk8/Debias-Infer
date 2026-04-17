@@ -1,5 +1,5 @@
 # Apply Chakrabortty et al. (2019) DDR code to our simulation design 
-# on high-dimensional inference with missing outcomes.
+# on high-dimensional inference with missing outcomes with other types of noise.
 #
 # Inputs:
 #   1) HD_M_est_functions.R   (from Chakrabortty et al.)
@@ -24,6 +24,7 @@ source("DDR_est_apply.R")
 
 suppressPackageStartupMessages({
   library(MASS)
+  library(rmutil)  # for rlaplace
 })
 
 # -----------------------------
@@ -149,33 +150,39 @@ for (i in 0:5) {
   x <- make_x(i, d)
 
   for (k in 0:2) {
-    beta_0 <- make_beta(k, d)
-    m_true <- sum(x * beta_0)
+    for (err in c("terr", "laperr")) {
+      beta_0 <- make_beta(k, d)
+      m_true <- sum(x * beta_0)
 
-    set.seed(jobid)
-    X_sim <- MASS::mvrnorm(n = n, mu = rep(0, d), Sigma = Sigma)
-    eps_err_sim <- rnorm(n, mean = 0, sd = sig)
-    Y_sim <- as.numeric(X_sim %*% beta_0 + eps_err_sim)
+      set.seed(jobid)
+      X_sim <- MASS::mvrnorm(n = n, mu = rep(0, d), Sigma = Sigma)
+      if (err == "terr") {
+        eps_err_sim <- rt(n, df = 2)  # t2 noise
+      } else if (err == "laperr") {
+        eps_err_sim <- rlaplace(n, m = 0, s = 1/sqrt(2))  # Laplace noise
+      }
+      Y_sim <- as.numeric(X_sim %*% beta_0 + eps_err_sim)
 
-    # MCAR
-    obs_prob1 <- 0.7
-    R1 <- rbinom(n, size = 1, prob = obs_prob1)
+      # MCAR
+      obs_prob1 <- 0.7
+      R1 <- rbinom(n, size = 1, prob = obs_prob1)
 
-    # MAR
-    obs_prob2 <- 1 / (1 + exp(-1 + X_sim[, 7] - X_sim[, 8]))
-    R2 <- rbinom(n, size = 1, prob = obs_prob2)
+      # MAR
+      obs_prob2 <- 1 / (1 + exp(-1 + X_sim[, 7] - X_sim[, 8]))
+      R2 <- rbinom(n, size = 1, prob = obs_prob2)
 
-    # Apply DDR to the SAME datasets
-    res_mcar <- run_one_setting(X_sim, Y_sim, R1, x, m_true)
-    save_result_summary(
-      res_mcar,
-      file = sprintf("HDM_DDR_res/DDR_AR_cov_homoerr_d%dn%d_MCAR%d_x%d_beta%d.csv", d, n, jobid, i, k)
-    )
+      # Apply DDR to the SAME datasets
+      res_mcar <- run_one_setting(X_sim, Y_sim, R1, x, m_true)
+      save_result_summary(
+        res_mcar,
+        file = sprintf("HDM_DDR_res/DDR_AR_cov_homoerr_d%dn%d_MCAR%d_x%d_beta%d_%s.csv", d, n, jobid, i, k, err)
+      )
 
-    res_mar <- run_one_setting(X_sim, Y_sim, R2, x, m_true)
-    save_result_summary(
-      res_mar,
-      file = sprintf("HDM_DDR_res/DDR_AR_cov_homoerr_d%dn%d_MAR%d_x%d_beta%d.csv", d, n, jobid, i, k)
-    )
+      res_mar <- run_one_setting(X_sim, Y_sim, R2, x, m_true)
+      save_result_summary(
+        res_mar,
+        file = sprintf("HDM_DDR_res/DDR_AR_cov_homoerr_d%dn%d_MAR%d_x%d_beta%d_%s.csv", d, n, jobid, i, k, err)
+      )
+    }
   }
 }

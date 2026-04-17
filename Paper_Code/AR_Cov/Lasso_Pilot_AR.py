@@ -31,6 +31,7 @@ for i in range(d):
         Sigma[i,j] = rho**(abs(i-j))
         Sigma[j,i] = rho**(abs(i-j))
 sig = 1
+Sigma_inv = np.linalg.inv(Sigma)
 
 ## Consider different simulation settings
 for i in range(6):
@@ -74,7 +75,7 @@ for i in range(6):
         # True regression function
         m_true = np.dot(x, beta_0)
         
-        for error in ['gauss', 'laperr', 'terr', 'unif']:
+        for error in ['gauss', 'laperr', 'terr']:
             np.random.seed(job_id)
 
             X_sim = np.random.multivariate_normal(mean=np.zeros(d), cov=Sigma, size=n)
@@ -84,8 +85,8 @@ for i in range(6):
                 eps_err_sim = np.random.laplace(loc=0, scale=1/np.sqrt(2), size=n)
             if error == 'terr':
                 eps_err_sim = np.random.standard_t(df=2, size=n)
-            if error == 'unif':
-                eps_err_sim = np.random.rand(n)*2*np.sqrt(3) - np.sqrt(3)
+            # if error == 'unif':
+            #     eps_err_sim = np.random.rand(n)*2*np.sqrt(3) - np.sqrt(3)
             Y_sim = np.dot(X_sim, beta_0) + eps_err_sim
             Sigma_hat = np.dot(X_sim.T, X_sim)/n
                 
@@ -132,7 +133,7 @@ for i in range(6):
                                        'm_ipw1': np.dot(x, beta_ipw1), 'sigma_hat_ipw1': sigma_ipw1,
                                        'm_ipw2': np.dot(x, beta_ipw2), 'sigma_hat_ipw2': sigma_ipw2,  
                                        'm_full': np.dot(x, beta_full), 'sigma_hat_full': sigma_full, 
-                                       'm_var_oracle': np.dot(np.dot(x, Sigma), x), 
-                                       'm_var_mcar': np.dot(np.dot(x, Sigma), x)/obs_prob1}, index=[0])
+                                       'm_var_oracle': sig**2*np.dot(np.dot(x, Sigma_inv), x), 
+                                       'm_var_mcar': sig**2*np.dot(np.dot(x, Sigma_inv), x)/obs_prob1}, index=[0])
             pilot_res1.to_csv('./pilot_res/lasso_pilot_AR_d'+str(d)+'_n'+str(n)+'_'+str(job_id)+\
                               '_x'+str(i)+'_beta'+str(k)+'_'+str(error)+'.csv', index=False)
