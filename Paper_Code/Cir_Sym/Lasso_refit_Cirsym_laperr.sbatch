@@ -3,7 +3,7 @@
 #SBATCH --partition short         # Slurm partition to use
 #SBATCH --array=1-1000               # How many tasks in the array
 #SBATCH --time 0-11:50             # Wall time limit in D-HH:MM
-#SBATCH --mem-per-cpu=900           # Memory limit for each tasks (in MB)
+#SBATCH --mem-per-cpu=2000           # Memory limit for each tasks (in MB)
 #SBATCH -o out/la_ref_cir_laperr_%j.out        # File to which STDOUT will be written
 #SBATCH -e out/la_ref_cir_laperr_%j.err        # File to which STDERR will be written
 #SBATCH --mail-type=ALL            # Type of email notification- NONE,BEGIN,END,FAIL,ALL
