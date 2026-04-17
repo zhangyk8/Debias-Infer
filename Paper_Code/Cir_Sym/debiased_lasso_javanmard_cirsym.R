@@ -20,7 +20,7 @@ for(i in 1:(d-1)){
 }
 sig = 1
 
-for(i in 0:4){
+for(i in 0:5){
   if(i == 0){
     ## x0
     x = array(0, dim = c(d,1))
@@ -48,7 +48,10 @@ for(i in 0:4){
     x = array(0, dim = c(d,1))
     x[,1] = 1/seq(1, d, by = 1)^2
   }
-  
+  if (i == 5){
+    x = array(0, dim = c(d,1))
+    x[,1] = rep(1/sqrt(d), d)
+  }
   for(k in 0:2){
     if(k == 0){
       s_beta = 5
@@ -79,12 +82,6 @@ for(i in 0:4){
     obs_prob2 = 1/(1 + exp(-1+X_sim[,6]-X_sim[,7]))
     unif = runif(n, min = 0, max = 1)
     R2 = as.numeric(unif <= obs_prob2)
-    
-    # dat = read.csv(paste0('./Data/dat_sim_', i, '_d', d, 'n', n, '.csv'), header = TRUE)
-    # X_sim = dat[,1:d]
-    # Y_sim = dat[,d+1]
-    # R1 = dat[,d+2]
-    # R2 = dat[,d+3]
     
     ## Debiased Lasso (Javanmard and Montarani, 2014)
     ### Complete-case data

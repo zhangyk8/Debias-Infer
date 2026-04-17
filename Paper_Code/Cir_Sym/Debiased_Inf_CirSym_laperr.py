@@ -35,7 +35,7 @@ for i in range(d):
 
 
 ## Consider different simulation settings
-for i in range(5):
+for i in range(5, 6):
     if i == 0:
         ## x0
         x = np.zeros((d,))
@@ -58,6 +58,9 @@ for i in range(5):
     if i == 4:
         ## x4
         x = 1/np.linspace(1, d, d)**2
+    if i == 5:
+        ## x5
+        x = np.ones((d,))/np.sqrt(d)
     for k in range(3):
         if k == 0:
             s_beta = 5
@@ -134,8 +137,8 @@ for i in range(5):
                               'when \gamma/n='+str(round(gamma_n_lst[j], 4))+'!')
                         dual_loss1[f_ind, j] = np.nan
                     else:
-                        dual_loss1[f_ind, j] = DualObj(X_test, x=x, Pi=np.diag(prop_score1_test), 
-                                                       ll_cur=ll_train1, gamma_n=gamma_n_lst[j])
+                        dual_loss1[f_ind, j] = float(np.squeeze(DualObj(X_test, x=x, Pi=np.diag(prop_score1_test), 
+                                                       ll_cur=ll_train1, gamma_n=gamma_n_lst[j])))
                 w_train2 = DebiasProg(X=X_train.copy(), x=x, Pi=np.diag(prop_score2_train), gamma_n=gamma_n_lst[j])
                 if any(np.isnan(w_train2)):
                     print(r'The primal debiasing program for this fold of the data is '\
@@ -149,8 +152,8 @@ for i in range(5):
                               'when \gamma/n='+str(round(gamma_n_lst[j], 4))+'!')
                         dual_loss2[f_ind, j] = np.nan
                     else:
-                        dual_loss2[f_ind, j] = DualObj(X_test, x=x, Pi=np.diag(prop_score2_test), 
-                                                       ll_cur=ll_train2, gamma_n=gamma_n_lst[j])
+                        dual_loss2[f_ind, j] = float(np.squeeze(DualObj(X_test, x=x, Pi=np.diag(prop_score2_test), 
+                                                       ll_cur=ll_train2, gamma_n=gamma_n_lst[j])))
             f_ind = f_ind + 1
         mean_dual_loss1 = np.mean(dual_loss1, axis=0)
         mean_dual_loss2 = np.mean(dual_loss2, axis=0)

@@ -21,7 +21,7 @@ for(i in 1:(d-1)){
 }
 sig = 1
 
-for(i in 0:4){
+for(i in 0:5){
   if(i == 0){
     ## x0
     x = array(0, dim = c(d,1))
@@ -49,7 +49,10 @@ for(i in 0:4){
     x = array(0, dim = c(d,1))
     x[,1] = 1/seq(1, d, by = 1)^2
   }
-  
+  if(i == 5){
+    x = array(0, dim = c(d,1))
+    x[,1] = rep(1/sqrt(d), d)
+  }
   for(k in 0:2){
     if(k == 0){
       s_beta = 5
@@ -180,7 +183,8 @@ for(i in 0:4){
                           m_full = m_debl_full, asym_se_full = asym_var_debl_full, 
                           sigma_hat_full = sigma_hat_debl_full, 
                           ci_len_full = ci_len_debl_full)
-    write.csv(debl_res, paste0("./debl_res/debl_cirsym_d", d, "_n", n, "_", jobid, "_x", i, "_beta", k, "_laperr.csv"), 
+    write.csv(debl_res, paste0("./debl_res/debl_cirsym_d", d, "_n", n, "_", jobid, 
+                               "_x", i, "_beta", k, "_laperr.csv"), 
               row.names=FALSE)
   }
 }
