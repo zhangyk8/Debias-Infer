@@ -124,15 +124,33 @@ def DebiasProg(X, x, Pi, gamma_n=0.1):
     constraints = [x - (1/np.sqrt(n))*(w @ Pi @ X) <= gamma_n, 
                    x - (1/np.sqrt(n))*(w @ Pi @ X) >= -gamma_n]
     debias_prog = cp.Problem(debias_obj, constraints)
-    try:
-        debias_prog.solve(solver=cp.MOSEK)
-    except cp.SolverError:
-        debias_prog.solve(solver=cp.CVXOPT, max_iters=30000)
-    if debias_prog.value == np.inf:
-        print('The primal debiasing program is infeasible!')
-        return np.nan*np.ones((n,))
-    else:
-        return w.value
+
+    # try:
+    #     debias_prog.solve(solver=cp.MOSEK)
+    # except cp.SolverError:
+    #     debias_prog.solve(solver=cp.CVXOPT, max_iters=30000)
+    # if debias_prog.value == np.inf:
+    #     print('The primal debiasing program is infeasible!')
+    #     return np.nan*np.ones((n,))
+    # else:
+    #     return w.value
+
+    solved = False
+
+    for solver, kwargs in [(cp.ECOS, {}), (cp.SCS, {"max_iters": 20000, "eps": 1e-5}),
+                           (cp.CVXOPT, {"max_iters": 30000})]:
+        try:
+            debias_prog.solve(solver=solver, **kwargs)
+            if debias_prog.status in ["optimal", "optimal_inaccurate"] and w.value is not None:
+                solved = True
+                break
+        except Exception as e:
+            print(f"Solver {solver} failed: {repr(e)}")
+
+    if not solved:
+        return np.full(X.shape[0], np.nan)
+
+    return np.asarray(w.value).reshape(-1)
     
 
 def SoftThres(theta, lamb):
