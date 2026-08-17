@@ -35,6 +35,7 @@ To infer the regression function <img src="https://latex.codecogs.com/svg.latex?
 - <img src="https://latex.codecogs.com/svg.latex?&space;x^{(2)}=(0,...,0,\underbrace{1}_{100^{th}},0,...,0)\in\mathbb{R}^d"/> so that <img src="https://latex.codecogs.com/svg.latex?&space;x^T\beta_0\in\mathbb{R}"/> becomes the 100-th coordinate of <img src="https://latex.codecogs.com/svg.latex?&space;\beta_0\in\mathbb{R}^d"/>.
 - <img src="https://latex.codecogs.com/svg.latex?&space;x^{(3)}=\left(1,\frac{1}{2},...,\frac{1}{d}\right)\in\mathbb{R}^d"/>. 
 - <img src="https://latex.codecogs.com/svg.latex?&space;x^{(4)}=\left(1,\frac{1}{2^2},...,\frac{1}{d^2}\right)\in\mathbb{R}^d"/>. 
+- <img src="https://latex.codecogs.com/svg.latex?&space;x^{(5)}=\left(\frac{1}{\sqrt{d}},...,\frac{1}{\sqrt{d}}\right)\in\mathbb{R}^d"/>, which is used to examine how a fully dense query point affects the inference results.
 
 
 For the comparative studies, we compare our debiased framework with the following four existing methods:
@@ -42,4 +43,6 @@ For the comparative studies, we compare our debiased framework with the followin
 2. `ridge.proj`: the projected ridge regression proposed by Buhlmann (2013).
 3. `sslasso`: the debiased lasso proposed by Javanmard and Montarani (2014).
 4. `refit`: solve a Lasso regression for <img src="https://latex.codecogs.com/svg.latex?&space;\hat{\beta}\in\mathbb{R}^d"/> and fit an ordinary least-square regression on the covariates in the support set of <img src="https://latex.codecogs.com/svg.latex?&space;\hat{\beta}\in\mathbb{R}^d"/>.
-
+5. `DDR`: a debiased and doubly robust estimator for high-dimensional regression coefficients under missing outcomes proposed by Chakrabortty et al. (2019).
+6. `SAS`: a surrogate-assisted imputation-based inference method for high-dimensional regression coefficients in the semi-supervised learning setting proposed by Hou et al. (2023).
+7. `SSL-AIPW`: an augmented inverse probability weighting method for inferring high-dimensional regression coefficients in the semi-supervised learning setting proposed by Tian et al. (2024).
